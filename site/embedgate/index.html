@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EmbedGate, site compagnon</title>
+<meta name="description" content="Projet final EmbedGate : le parcours en 6 phases, la puce et ses registres, les interruptions, les alarmes, MQTT et la cible embarquée, en schémas.">
+<style>
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/atkinson-hyperlegible-400.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: italic; font-weight: 400; font-display: swap; src: url(fonts/atkinson-hyperlegible-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/atkinson-hyperlegible-700.woff2) format("woff2"); }
+@font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 600 800; font-display: swap; src: url(fonts/bricolage-grotesque-variable.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/jetbrains-mono-variable.woff2) format("woff2"); }
+
+/* Couleurs porteuses de sens, les mêmes dans tous les schémas :
+   sarcelle = la puce et le pilote C, indigo = la passerelle C++,
+   ambre = le superviseur Python, rouge = une alarme. Pointillés = fourni. */
+:root {
+  --bg: #f3f5f8; --panel: #ffffff; --fg: #17202a; --muted: #5b6876; --line: #c8d1da;
+  --c: #0b7a6b;   --c-soft: #dcf0ec;
+  --cpp: #3d4db3; --cpp-soft: #e3e6fa;
+  --py: #a35406;  --py-soft: #fbead6;
+  --al: #c23a2c;  --al-soft: #fbe4e1;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171c; --panel: #19222a; --fg: #e4eaef; --muted: #98a6b3; --line: #33414e;
+    --c: #52c4b0;   --c-soft: #163934;
+    --cpp: #9aa6f5; --cpp-soft: #232a4d;
+    --py: #f0a65f;  --py-soft: #3b2814;
+    --al: #ff7c6c;  --al-soft: #3d1c19;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171c; --panel: #19222a; --fg: #e4eaef; --muted: #98a6b3; --line: #33414e;
+  --c: #52c4b0;   --c-soft: #163934;
+  --cpp: #9aa6f5; --cpp-soft: #232a4d;
+  --py: #f0a65f;  --py-soft: #3b2814;
+  --al: #ff7c6c;  --al-soft: #3d1c19;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+a { color: var(--cpp); }
+.page { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; gap: 48px; }
+header { display: grid; gap: 12px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 6vw, 46px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 650; font-size: 25px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
+p { margin: 0; max-width: 70ch; }
+section { display: grid; gap: 16px; }
+.lead { font-size: 18px; }
+.phase-tag { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); vertical-align: middle; margin-left: 6px; white-space: nowrap; }
+
+nav.toc { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+nav.toc .in { max-width: 880px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
+nav.toc a { flex: none; font-size: 14px; text-decoration: none; color: var(--fg); padding: 5px 11px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); }
+nav.toc a:hover { border-color: var(--cpp); }
+nav.toc button { flex: none; margin-left: auto; font: inherit; font-size: 14px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; display: inline-block; }
+.sw.c { background: var(--c-soft); border-color: var(--c); }
+.sw.cpp { background: var(--cpp-soft); border-color: var(--cpp); }
+.sw.py { background: var(--py-soft); border-color: var(--py); }
+.sw.al { background: var(--al-soft); border-color: var(--al); }
+.sw.given { background: transparent; border-color: var(--muted); border-style: dashed; }
+
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; }
+.fig-scroll { overflow-x: auto; }
+figcaption { font-size: 14px; color: var(--muted); max-width: 74ch; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+pre { margin: 0; font-family: var(--mono); font-size: 13px; line-height: 1.5; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+.table-scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+.note { border-left: 3px solid var(--cpp); padding: 4px 0 4px 14px; max-width: 70ch; }
+.note.warn { border-left-color: var(--al); }
+
+/* Le parcours : cases à cocher par phase */
+.phases { display: grid; gap: 10px; }
+details.ph { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+details.ph > summary { list-style: none; cursor: pointer; padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center; }
+details.ph > summary::-webkit-details-marker { display: none; }
+.ph .code { font-family: var(--mono); font-weight: 600; font-size: 13px; width: 38px; height: 38px; border-radius: 8px; display: grid; place-items: center; border: 1.5px solid var(--line); }
+.ph .code.c { background: var(--c-soft); border-color: var(--c); }
+.ph .code.cpp { background: var(--cpp-soft); border-color: var(--cpp); }
+.ph .code.py { background: var(--py-soft); border-color: var(--py); }
+.ph .t1 { font-weight: 700; }
+.ph .t2 { font-size: 14px; color: var(--muted); }
+.ph .count { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+.ph .count.done { color: var(--c); font-weight: 600; }
+.ph .body { padding: 0 16px 14px 68px; display: grid; gap: 10px; }
+.ph .goal { font-size: 15px; }
+.ph ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ph label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; cursor: pointer; }
+.ph input { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--c); flex: none; }
+.ph input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.small { font-size: 13px; color: var(--muted); }
+
+/* Schémas : tout passe par les jetons, donc lisible dans les deux thèmes. */
+svg.dg { display: block; width: 100%; min-width: 680px; height: auto; color: var(--fg); font-family: var(--body); }
+.dg text { fill: currentColor; font-size: 12.5px; }
+.dg .t { font-weight: 700; font-size: 13.5px; }
+.dg .s { fill: var(--muted); font-size: 11.5px; }
+.dg .m { font-family: var(--mono); font-size: 11.5px; }
+.dg .box { fill: var(--panel); stroke: var(--line); stroke-width: 1.3; }
+.dg .strong { fill: var(--panel); stroke: currentColor; stroke-width: 1.5; }
+.dg .c { fill: var(--c-soft); stroke: var(--c); stroke-width: 1.5; }
+.dg .cpp { fill: var(--cpp-soft); stroke: var(--cpp); stroke-width: 1.5; }
+.dg .py { fill: var(--py-soft); stroke: var(--py); stroke-width: 1.5; }
+.dg .al { fill: var(--al-soft); stroke: var(--al); stroke-width: 1.5; }
+.dg .given { stroke-dasharray: 6 4; }
+.dg .res { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+.dg .c-t { fill: var(--c); font-weight: 700; }
+.dg .cpp-t { fill: var(--cpp); font-weight: 700; }
+.dg .py-t { fill: var(--py); font-weight: 700; }
+.dg .al-t { fill: var(--al); font-weight: 700; }
+.dg .edge { stroke: currentColor; stroke-width: 1.4; fill: none; }
+.dg .edge.al { stroke: var(--al); fill: none; }
+.dg .edge.dash { stroke-dasharray: 5 4; }
+.dg .life { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.dg .head { fill: currentColor; }
+.dg .head-al { fill: var(--al); }
+
+/* La courbe d'hystérésis */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--panel); }
+.seg button { font: inherit; font-size: 14px; border: 0; background: transparent; color: var(--fg); padding: 6px 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.chart-head { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+.verdict { font-size: 15px; }
+.verdict b.bad { color: var(--al); }
+.verdict b.good { color: var(--c); }
+.chart-wrap { position: relative; }
+svg.ch { display: block; width: 100%; min-width: 680px; height: auto; color: var(--fg); font-family: var(--body); touch-action: pan-y; }
+.ch text { fill: var(--muted); font-size: 11.5px; }
+.ch .grid { stroke: var(--line); stroke-width: 1; }
+.ch .axis { stroke: var(--muted); stroke-width: 1; }
+.ch .series { stroke: var(--fg); stroke-width: 2; fill: none; stroke-linejoin: round; }
+.ch .zone { fill: var(--al-soft); }
+.ch .thr { stroke: var(--al); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.ch .ret { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 2 4; }
+.ch .lab-al { fill: var(--al); font-weight: 700; }
+.ch .ev-on { fill: var(--al); stroke: var(--panel); stroke-width: 2; }
+.ch .ev-off { fill: var(--panel); stroke: var(--fg); stroke-width: 2; }
+.ch .door { fill: var(--py-soft); stroke: var(--py); stroke-width: 1.2; }
+.ch .cross { stroke: var(--muted); stroke-width: 1; }
+.ch .dot { fill: var(--fg); stroke: var(--panel); stroke-width: 2; }
+.tip { position: absolute; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 13px; line-height: 1.4; padding: 6px 9px; border-radius: 6px; white-space: nowrap; opacity: 0; transition: opacity .1s; }
+.tip.on { opacity: 1; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 14px; color: var(--muted); display: grid; gap: 6px; }
+@media (max-width: 600px) {
+  .ph .body { padding-left: 16px; }
+  details.ph > summary { grid-template-columns: auto 1fr; }
+  .ph .count { grid-column: 2; }
+}
+@media (forced-colors: active) {
+  .dg .c, .dg .cpp, .dg .py, .dg .al { stroke-width: 2.5; }
+}
+</style>
+</head>
+<body>
+
+<nav class="toc" aria-label="Sommaire">
+  <div class="in">
+    <a href="#parcours">Parcours</a>
+    <a href="#chaine">La chaîne</a>
+    <a href="#puce">La puce</a>
+    <a href="#irq">Interruption</a>
+    <a href="#demon">Threads</a>
+    <a href="#alarmes">Alarmes</a>
+    <a href="#mqtt">MQTT</a>
+    <a href="#cible">Cible ARM</a>
+    <a href="#can">Extension CAN</a>
+    <button type="button" id="theme" aria-label="Changer de thème">◐ thème</button>
+  </div>
+</nav>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Projet final · EXPLEO · 12 → 26 octobre 2026</div>
+    <h1>EmbedGate, le site compagnon</h1>
+    <p class="lead">Une passerelle qui <strong>surveille les capteurs</strong> d'une chambre froide, <strong>alerte</strong> dès qu'une valeur dérive, et laisse l'opérateur <strong>agir à distance</strong>. Ce site montre en schémas ce que vous construisez, phase par phase. Les règles exactes sont dans <code>INTERFACES.md</code> : en cas de doute, c'est lui qui fait foi.</p>
+    <div class="legend" aria-label="Légende des couleurs">
+      <span><i class="sw c"></i>puce et pilote (C)</span>
+      <span><i class="sw cpp"></i>passerelle (C++)</span>
+      <span><i class="sw py"></i>superviseur (Python)</span>
+      <span><i class="sw al"></i>alarme</span>
+      <span><i class="sw given"></i>fourni, ne pas modifier</span>
+    </div>
+  </header>
+
+  <!-- ================= PARCOURS ================= -->
+  <section id="parcours">
+    <h2>Le parcours : 6 phases, 6 livrables qui s'exécutent</h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 178" role="img" aria-label="Calendrier : P1 le pilote C les 12 et 13 octobre, P2 la chaîne complète le 14, P3 le cœur de la passerelle les 15 et 16 avec un bilan de mi-parcours le 16, P4 supervision et commandes les 19 et 20, P5 la cible embarquée les 21 et 22, P6 la finalisation le 23 avec le tag v1.0, soutenance le 26.">
+          <defs><marker id="hp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+          <!-- jours : x = 40 + i*62 (+14 après le week-end) -->
+          <g text-anchor="middle">
+            <text class="t" x="71" y="18">J1</text><text class="s" x="71" y="34">lun 12</text>
+            <text class="t" x="133" y="18">J2</text><text class="s" x="133" y="34">mar 13</text>
+            <text class="t" x="195" y="18">J3</text><text class="s" x="195" y="34">mer 14</text>
+            <text class="t" x="257" y="18">J4</text><text class="s" x="257" y="34">jeu 15</text>
+            <text class="t" x="319" y="18">J5</text><text class="s" x="319" y="34">ven 16</text>
+            <text class="t" x="395" y="18">J6</text><text class="s" x="395" y="34">lun 19</text>
+            <text class="t" x="457" y="18">J7</text><text class="s" x="457" y="34">mar 20</text>
+            <text class="t" x="519" y="18">J8</text><text class="s" x="519" y="34">mer 21</text>
+            <text class="t" x="581" y="18">J9</text><text class="s" x="581" y="34">jeu 22</text>
+            <text class="t" x="643" y="18">J10</text><text class="s" x="643" y="34">ven 23</text>
+            <text class="t" x="719" y="18">Jury</text><text class="s" x="719" y="34">lun 26</text>
+          </g>
+          <line class="life" x1="357" y1="8" x2="357" y2="168"/>
+          <line class="life" x1="681" y1="8" x2="681" y2="168"/>
+
+          <rect class="c" x="42" y="48" width="120" height="44" rx="6"/>
+          <text class="t" x="102" y="67" text-anchor="middle">P1 Pilote C</text>
+          <text class="s" x="102" y="83" text-anchor="middle">puce · IRQ · ARM</text>
+
+          <rect class="strong" x="166" y="48" width="58" height="44" rx="6"/>
+          <text class="t" x="195" y="67" text-anchor="middle">P2</text>
+          <text class="s" x="195" y="83" text-anchor="middle">chaîne</text>
+
+          <rect class="cpp" x="228" y="48" width="120" height="44" rx="6"/>
+          <text class="t" x="288" y="67" text-anchor="middle">P3 Passerelle</text>
+          <text class="s" x="288" y="83" text-anchor="middle">threads · alarmes</text>
+
+          <rect class="py" x="366" y="48" width="120" height="44" rx="6"/>
+          <text class="t" x="426" y="67" text-anchor="middle">P4 Superviser</text>
+          <text class="s" x="426" y="83" text-anchor="middle">tableau · commandes</text>
+
+          <rect class="strong" x="490" y="48" width="120" height="44" rx="6"/>
+          <text class="t" x="550" y="67" text-anchor="middle">P5 Cible ARM</text>
+          <text class="s" x="550" y="83" text-anchor="middle">QEMU · Buildroot</text>
+
+          <rect class="box" x="614" y="48" width="58" height="44" rx="6"/>
+          <text class="t" x="643" y="67" text-anchor="middle">P6</text>
+          <text class="s" x="643" y="83" text-anchor="middle">finaliser</text>
+
+          <rect class="box" x="690" y="48" width="58" height="44" rx="6"/>
+          <text class="t" x="719" y="74" text-anchor="middle">🎤</text>
+
+          <!-- tags -->
+          <g class="m" text-anchor="middle">
+            <path class="head" d="M162,104 l6,6 l-6,6 l-6,-6 z"/><text class="m" x="162" y="132">v0.1</text>
+            <path class="head" d="M224,104 l6,6 l-6,6 l-6,-6 z"/><text class="m" x="224" y="132">v0.2</text>
+            <path class="head" d="M348,104 l6,6 l-6,6 l-6,-6 z"/><text class="m" x="348" y="132">v0.3</text>
+            <path class="head" d="M486,104 l6,6 l-6,6 l-6,-6 z"/><text class="m" x="486" y="132">v0.4</text>
+            <path class="head" d="M610,104 l6,6 l-6,6 l-6,-6 z"/><text class="m" x="610" y="132">v0.5</text>
+            <path class="head" d="M672,104 l6,6 l-6,6 l-6,-6 z"/><text class="m t" x="672" y="132">v1.0</text>
+          </g>
+          <text class="s" x="348" y="160" text-anchor="end">▲ ven. 16 h : bilan de mi-parcours</text>
+          <text class="s" x="366" y="160">week-end</text>
+        </svg>
+      </div>
+      <figcaption>Chaque phase se termine par quelque chose qu'on <strong>lance</strong>, vérifié automatiquement par le formateur, critère par critère. Les tags sont des <strong>repères</strong> : un tag posé en retard n'est jamais pénalisé, seul compte l'état de <code>v1.0</code>. Les tests font partie de chaque phase, il n'y a pas de « journée des tests ».</figcaption>
+    </figure>
+
+    <h3>Où en êtes-vous ?</h3>
+    <p class="small">Cochez au fur et à mesure. Les cases sont mémorisées dans <em>ce</em> navigateur uniquement : c'est un pense-bête pour le groupe, pas une note.</p>
+    <div class="phases" id="phases"></div>
+    <p><button type="button" id="reset-checks" class="small" style="font:inherit;font-size:13px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0">Tout décocher</button></p>
+  </section>
+
+  <!-- ================= LA CHAÎNE ================= -->
+  <section id="chaine">
+    <h2>La chaîne complète, et qui écrit quoi</h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 420" role="img" aria-label="La puce fournie écrit dans ses registres. Le pilote C sert les interruptions et appelle la passerelle C++. Dans la passerelle, un thread d'acquisition remplit une file, un thread de traitement la vide et passe les mesures au moteur d'alarmes, qui prévient le journal et la publication MQTT. Le broker transmet au superviseur Python, qui renvoie des commandes jusqu'aux registres de la puce.">
+          <defs><marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+
+          <!-- puce fournie -->
+          <rect class="c given" x="20" y="30" width="160" height="70" rx="6"/>
+          <text class="t" x="100" y="56" text-anchor="middle">Puce capteur</text>
+          <text class="m" x="100" y="75" text-anchor="middle">sim_capteurs</text>
+          <text class="s" x="100" y="91" text-anchor="middle">fournie · rejoue un scénario</text>
+
+          <line class="edge" x1="100" y1="100" x2="100" y2="147" marker-end="url(#ha)"/>
+          <text class="s" x="108" y="128">écrit DATA, lève IRQ</text>
+
+          <rect class="c given" x="20" y="150" width="160" height="60" rx="6"/>
+          <text class="t" x="100" y="174" text-anchor="middle">Registres</text>
+          <text class="s" x="100" y="194" text-anchor="middle">bus partagé (mmap)</text>
+
+          <line class="edge" x1="180" y1="180" x2="207" y2="180" marker-end="url(#ha)"/>
+
+          <rect class="c" x="210" y="150" width="150" height="60" rx="6"/>
+          <text class="t" x="285" y="174" text-anchor="middle">Pilote C</text>
+          <text class="s" x="285" y="194" text-anchor="middle">timerfd · W1C · P1</text>
+
+          <!-- passerelle -->
+          <rect class="cpp" x="395" y="20" width="345" height="270" rx="8" style="fill-opacity:.55"/>
+          <text class="cpp-t" x="410" y="40">embedgate-gw (C++) · P2 → P3</text>
+
+          <polyline class="edge" points="360,180 380,180 380,82 407,82" marker-end="url(#ha)"/>
+          <text class="s" x="372" y="138" text-anchor="end">callback</text>
+
+          <rect class="box" x="410" y="60" width="96" height="44" rx="5"/>
+          <text class="t" x="458" y="87" text-anchor="middle">acquisition</text>
+          <line class="edge" x1="506" y1="82" x2="524" y2="82" marker-end="url(#ha)"/>
+          <rect class="box" x="527" y="60" width="96" height="44" rx="5"/>
+          <text class="t" x="575" y="80" text-anchor="middle">file</text>
+          <text class="s" x="575" y="96" text-anchor="middle">thread-safe</text>
+          <line class="edge" x1="623" y1="82" x2="638" y2="82" marker-end="url(#ha)"/>
+          <rect class="box" x="641" y="60" width="90" height="44" rx="5"/>
+          <text class="t" x="686" y="87" text-anchor="middle">traitement</text>
+
+          <line class="edge" x1="686" y1="104" x2="686" y2="137" marker-end="url(#ha)"/>
+          <rect class="al" x="540" y="140" width="190" height="50" rx="5"/>
+          <text class="t" x="635" y="161" text-anchor="middle">moteur d'alarmes</text>
+          <text class="s" x="635" y="178" text-anchor="middle">seuils + hystérésis (Strategy)</text>
+
+          <polyline class="edge" points="560,190 560,212 480,212 480,227" marker-end="url(#ha)"/>
+          <line class="edge" x1="680" y1="190" x2="680" y2="227" marker-end="url(#ha)"/>
+          <text class="s" x="620" y="207" text-anchor="middle">prévient (Observer)</text>
+
+          <rect class="box" x="410" y="230" width="130" height="44" rx="5"/>
+          <text class="t" x="475" y="250" text-anchor="middle">journal</text>
+          <text class="m" x="475" y="266" text-anchor="middle">embedgate.log</text>
+          <rect class="box" x="600" y="230" width="130" height="44" rx="5"/>
+          <text class="t" x="665" y="250" text-anchor="middle">publication</text>
+          <text class="s" x="665" y="266" text-anchor="middle">mesures, alarmes</text>
+
+          <!-- broker et superviseur -->
+          <polyline class="edge" points="665,274 665,355 563,355" marker-end="url(#ha)"/>
+          <rect class="box given" x="400" y="325" width="160" height="60" rx="6"/>
+          <text class="t" x="480" y="350" text-anchor="middle">Broker MQTT</text>
+          <text class="s" x="480" y="368" text-anchor="middle">Mosquitto</text>
+
+          <line class="edge" x1="400" y1="343" x2="333" y2="343" marker-end="url(#ha)"/>
+          <text class="s" x="366" y="335" text-anchor="middle">mesures</text>
+          <line class="edge" x1="330" y1="370" x2="397" y2="370" marker-end="url(#ha)"/>
+          <text class="s" x="366" y="388" text-anchor="middle">cmd</text>
+
+          <rect class="py" x="150" y="320" width="180" height="70" rx="6"/>
+          <text class="t" x="240" y="344" text-anchor="middle">Superviseur Python</text>
+          <text class="s" x="240" y="362" text-anchor="middle">tableau de bord · commandes</text>
+          <text class="s" x="240" y="378" text-anchor="middle">P2 → P4</text>
+
+          <line class="edge dash" x1="480" y1="325" x2="480" y2="294" marker-end="url(#ha)"/>
+          <text class="s" x="488" y="314">cmd → passerelle → pilote → CALIB / CTRL</text>
+        </svg>
+      </div>
+      <figcaption>En pointillés, ce qui est <strong>fourni</strong> : la puce et ses registres, le broker. Tout le reste, vous l'écrivez. Dès la <strong>P2</strong>, une mesure parcourt toute la chaîne, même si chaque maillon est encore minimal : les phases suivantes ne font qu'épaissir une chaîne qui marche déjà.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= LA PUCE ================= -->
+  <section id="puce">
+    <h2>La puce : une datasheet, des registres <span class="phase-tag">P1</span></h2>
+    <p>Vous n'écrivez pas la puce, vous écrivez le <strong>pilote</strong> qui lui parle, comme avec une vraie carte. Tout se résume à lire et écrire des mots de 32 bits à des positions fixes (<em>offsets</em>).</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Offset</th><th>Registre</th><th>Accès</th><th>Contenu</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">0x00</td><td><code>ID</code></td><td>lecture</td><td>signature <code>0xE9B0DA7A</code> : la puce est bien là</td></tr>
+          <tr><td class="mono">0x04</td><td><code>STATUS</code></td><td>lecture</td><td>prête, en défaut, compteur d'acquisitions</td></tr>
+          <tr><td class="mono">0x08</td><td><code>CTRL</code></td><td>lecture / écriture</td><td>marche, reset, auto-test</td></tr>
+          <tr><td class="mono">0x0C</td><td><code>IRQ_STATUS</code></td><td>lecture</td><td>bit <em>n</em> = donnée neuve sur le canal <em>n</em> (interruption en attente)</td></tr>
+          <tr><td class="mono">0x10</td><td><code>IRQ_ENABLE</code></td><td>lecture / écriture</td><td>bit <em>n</em> = interruption du canal <em>n</em> autorisée</td></tr>
+          <tr><td class="mono">0x14</td><td><code>FAULT_MAP</code></td><td>lecture</td><td>bit <em>n</em> = canal <em>n</em> en panne</td></tr>
+          <tr><td class="mono">0x18</td><td><code>IRQ_ACK</code></td><td>écriture <strong>W1C</strong></td><td>écrire 1 sur le bit <em>n</em> acquitte le canal <em>n</em></td></tr>
+          <tr><td class="mono">0x20 + 4n</td><td><code>DATA[n]</code></td><td>lecture</td><td>mesure brute (0 : milli-°C · 1 : milli-mbar · 2 : µA · 3 : porte 0/1)</td></tr>
+          <tr><td class="mono">0x40 + 4n</td><td><code>CALIB[n]</code></td><td>lecture / écriture</td><td>décalage ajouté par la puce, en unité brute</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 236" role="img" aria-label="Les 16 bits de poids faible de quatre registres. STATUS : bit 0 READY, bit 1 FAULT, bits 8 à 15 compteur. CTRL : bit 0 ENABLE, bit 1 RESET, bit 2 SELFTEST. IRQ_STATUS et FAULT_MAP : bits 0 à 3 pour les canaux 0 à 3. Les autres bits sont réservés.">
+          <!-- bit b à x = 110 + (15-b)*40 -->
+          <g class="m" text-anchor="middle">
+            <text x="130" y="20">15</text><text x="170" y="20">14</text><text x="210" y="20">13</text><text x="250" y="20">12</text>
+            <text x="290" y="20">11</text><text x="330" y="20">10</text><text x="370" y="20">9</text><text x="410" y="20">8</text>
+            <text x="450" y="20">7</text><text x="490" y="20">6</text><text x="530" y="20">5</text><text x="570" y="20">4</text>
+            <text x="610" y="20">3</text><text x="650" y="20">2</text><text x="690" y="20">1</text><text x="730" y="20">0</text>
+          </g>
+          <!-- STATUS -->
+          <text class="t" x="20" y="54">STATUS</text>
+          <rect class="c" x="110" y="32" width="320" height="36"/><text x="270" y="54" text-anchor="middle">compteur d'acquisitions</text>
+          <rect class="res" x="430" y="32" width="240" height="36"/><text class="s" x="550" y="54" text-anchor="middle">réservé</text>
+          <rect class="al" x="670" y="32" width="40" height="36"/><text class="m" x="690" y="54" text-anchor="middle">FLT</text>
+          <rect class="c" x="710" y="32" width="40" height="36"/><text class="m" x="730" y="54" text-anchor="middle">RDY</text>
+          <!-- CTRL -->
+          <text class="t" x="20" y="104">CTRL</text>
+          <rect class="res" x="110" y="82" width="520" height="36"/><text class="s" x="370" y="104" text-anchor="middle">réservé</text>
+          <rect class="c" x="630" y="82" width="40" height="36"/><text class="m" x="650" y="104" text-anchor="middle">TST</text>
+          <rect class="c" x="670" y="82" width="40" height="36"/><text class="m" x="690" y="104" text-anchor="middle">RST</text>
+          <rect class="c" x="710" y="82" width="40" height="36"/><text class="m" x="730" y="104" text-anchor="middle">EN</text>
+          <!-- IRQ_STATUS -->
+          <text class="t" x="20" y="154">IRQ_STATUS</text>
+          <rect class="res" x="110" y="132" width="480" height="36"/><text class="s" x="350" y="154" text-anchor="middle">réservé</text>
+          <rect class="c" x="590" y="132" width="40" height="36"/><text class="m" x="610" y="154" text-anchor="middle">ch3</text>
+          <rect class="c" x="630" y="132" width="40" height="36"/><text class="m" x="650" y="154" text-anchor="middle">ch2</text>
+          <rect class="c" x="670" y="132" width="40" height="36"/><text class="m" x="690" y="154" text-anchor="middle">ch1</text>
+          <rect class="c" x="710" y="132" width="40" height="36"/><text class="m" x="730" y="154" text-anchor="middle">ch0</text>
+          <!-- FAULT_MAP -->
+          <text class="t" x="20" y="204">FAULT_MAP</text>
+          <rect class="res" x="110" y="182" width="480" height="36"/><text class="s" x="350" y="204" text-anchor="middle">réservé</text>
+          <rect class="al" x="590" y="182" width="40" height="36"/><text class="m" x="610" y="204" text-anchor="middle">ch3</text>
+          <rect class="al" x="630" y="182" width="40" height="36"/><text class="m" x="650" y="204" text-anchor="middle">ch2</text>
+          <rect class="al" x="670" y="182" width="40" height="36"/><text class="m" x="690" y="204" text-anchor="middle">ch1</text>
+          <rect class="al" x="710" y="182" width="40" height="36"/><text class="m" x="730" y="204" text-anchor="middle">ch0</text>
+        </svg>
+      </div>
+      <figcaption>Les 16 bits de poids faible (les bits 16 à 31 sont réservés). Lire un champ, c'est <strong>masquer puis décaler</strong> : le compteur vaut <code>(status &gt;&gt; 8) &amp; 0xFF</code>. Tester un bit, c'est <code>status &amp; (1u &lt;&lt; 1)</code>. Et l'accès passe toujours par un pointeur <code>volatile</code>, sinon le compilateur peut garder une ancienne valeur en cache au lieu de relire la puce.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= INTERRUPTION ================= -->
+  <section id="irq">
+    <h2>Une interruption, pas à pas <span class="phase-tag">P1</span></h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 330" role="img" aria-label="La puce écrit DATA de 0 et met le bit 0 d'IRQ_STATUS à 1. Au tick du timerfd, le pilote lit IRQ_STATUS, appelle le callback du canal 0, puis écrit 1 sur le bit 0 d'IRQ_ACK, et la puce fait retomber le bit d'IRQ_STATUS à 0. Effacer le bit directement dans IRQ_STATUS ne marche pas : la puce le réécrit.">
+          <defs>
+            <marker id="hi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+          </defs>
+          <rect class="c given" x="40" y="10" width="140" height="36" rx="6"/><text class="t" x="110" y="33" text-anchor="middle">Puce</text>
+          <rect class="c given" x="310" y="10" width="140" height="36" rx="6"/><text class="t" x="380" y="33" text-anchor="middle">IRQ_STATUS · ACK</text>
+          <rect class="c" x="580" y="10" width="140" height="36" rx="6"/><text class="t" x="650" y="33" text-anchor="middle">Votre pilote</text>
+          <line class="life" x1="110" y1="46" x2="110" y2="300"/>
+          <line class="life" x1="650" y1="46" x2="650" y2="300"/>
+          <line class="life" x1="380" y1="46" x2="380" y2="300"/>
+
+          <!-- valeurs du registre -->
+          <rect class="box" x="350" y="56" width="60" height="22" rx="4"/><text class="m" x="380" y="71" text-anchor="middle">0000</text>
+
+          <text class="s" x="20" y="100">①</text>
+          <line class="edge" x1="110" y1="102" x2="346" y2="102" marker-end="url(#hi)"/>
+          <text x="228" y="95" text-anchor="middle">écrit DATA[0], lève le bit 0</text>
+          <rect class="c" x="350" y="91" width="60" height="22" rx="4"/><text class="m" x="380" y="106" text-anchor="middle">0001</text>
+
+          <text class="s" x="20" y="140">②</text>
+          <text x="640" y="140" text-anchor="end">tick du timerfd (chaque période)</text>
+
+          <text class="s" x="20" y="176">③</text>
+          <line class="edge" x1="650" y1="178" x2="414" y2="178" marker-end="url(#hi)"/>
+          <text x="532" y="171" text-anchor="middle">lit : 0001 → canal 0</text>
+
+          <text class="s" x="20" y="212">④</text>
+          <text x="640" y="212" text-anchor="end">appelle callback(ch=0, brut)</text>
+
+          <text class="s" x="20" y="248">⑤</text>
+          <line class="edge" x1="650" y1="250" x2="414" y2="250" marker-end="url(#hi)"/>
+          <text x="532" y="243" text-anchor="middle">écrit 0001 dans IRQ_ACK</text>
+          <rect class="box" x="350" y="239" width="60" height="22" rx="4"/><text class="m" x="380" y="254" text-anchor="middle">0000</text>
+
+          <rect class="al" x="40" y="276" width="680" height="44" rx="6"/>
+          <text class="al-t" x="56" y="295">Piège : effacer le bit directement dans IRQ_STATUS</text>
+          <text x="56" y="312">lecture seule : la puce réécrit le bit, et le callback revient à chaque tick avec une vieille valeur.</text>
+        </svg>
+      </div>
+      <figcaption><strong>W1C</strong> (<em>write 1 to clear</em>) : on acquitte en écrivant 1 à la place du bit, dans un registre dédié, <code>IRQ_ACK</code> (comme le registre <code>ICR</code> des STM32). Les bits à 0 n'ont aucun effet : acquitter le canal 0 ne touche pas un canal 2 qui viendrait de lever son bit entre la lecture ③ et l'écriture ⑤. Avec un « lire, effacer le bit, réécrire », on l'aurait effacé sans le voir.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= THREADS ================= -->
+  <section id="demon">
+    <h2>Recevoir vite, traiter à part <span class="phase-tag">P3</span></h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 214" role="img" aria-label="Le thread d'acquisition dépose chaque mesure dans une file protégée par un mutex. Le thread de traitement attend sur une variable de condition, retire les mesures et les passe au moteur d'alarmes. À l'arrêt, on lève un drapeau, on réveille le consommateur, on vide la file et on joint les deux threads.">
+          <defs><marker id="ht" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+          <rect class="cpp" x="20" y="30" width="170" height="70" rx="6"/>
+          <text class="t" x="105" y="56" text-anchor="middle">thread acquisition</text>
+          <text class="s" x="105" y="74" text-anchor="middle">sert les interruptions</text>
+          <text class="s" x="105" y="90" text-anchor="middle">ne doit jamais attendre</text>
+          <line class="edge" x1="190" y1="65" x2="247" y2="65" marker-end="url(#ht)"/>
+          <text class="s" x="219" y="56" text-anchor="middle">pousser</text>
+
+          <rect class="box" x="250" y="30" width="260" height="70" rx="6"/>
+          <text class="t" x="380" y="22" text-anchor="middle">file thread-safe</text>
+          <rect class="cpp" x="265" y="45" width="42" height="40" rx="3"/>
+          <rect class="cpp" x="313" y="45" width="42" height="40" rx="3"/>
+          <rect class="cpp" x="361" y="45" width="42" height="40" rx="3"/>
+          <rect class="res" x="409" y="45" width="42" height="40" rx="3"/>
+          <rect class="res" x="457" y="45" width="42" height="40" rx="3"/>
+          <text class="m" x="286" y="70" text-anchor="middle">m3</text>
+          <text class="m" x="334" y="70" text-anchor="middle">m2</text>
+          <text class="m" x="382" y="70" text-anchor="middle">m1</text>
+          <line class="edge" x1="510" y1="65" x2="567" y2="65" marker-end="url(#ht)"/>
+          <text class="s" x="539" y="56" text-anchor="middle">retirer</text>
+
+          <rect class="cpp" x="570" y="30" width="170" height="70" rx="6"/>
+          <text class="t" x="655" y="56" text-anchor="middle">thread traitement</text>
+          <text class="s" x="655" y="74" text-anchor="middle">attend si la file est vide</text>
+          <text class="s" x="655" y="90" text-anchor="middle">alarmes, publication</text>
+
+          <text class="s" x="380" y="122" text-anchor="middle">mutex + condition_variable : un seul thread touche la file à la fois</text>
+
+          <rect class="box" x="20" y="140" width="720" height="62" rx="6"/>
+          <text class="t" x="36" y="162">Arrêt propre (SIGTERM, Ctrl-C)</text>
+          <text x="36" y="182">① le gestionnaire de signal lève un drapeau · ② on réveille le thread qui attend · ③ on vide la file</text>
+          <text x="36" y="197">④ on joint les deux threads · ⑤ ligne STOP au journal, testament MQTT, code de sortie 0</text>
+        </svg>
+      </div>
+      <figcaption>Si l'acquisition faisait elle-même le traitement (alarmes, journal, réseau), une publication MQTT un peu lente ferait rater des interruptions. La file découple les deux rythmes. C'est le même producteur / consommateur qu'en FreeRTOS et qu'au module C++, appliqué ici pour de vrai. ThreadSanitizer (<code>-DSANITIZE=thread</code>) vérifie que vous n'avez rien oublié.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= ALARMES ================= -->
+  <section id="alarmes">
+    <h2>3 h du matin : une alarme, pas trente <span class="phase-tag">P3</span></h2>
+    <p>Le scénario <code>chambre-froide.scn</code> : la chambre est à 4 °C. À 10 s, la porte s'ouvre ; à 14 s, elle se referme, mais le joint a cédé. La température grimpe vers 11 °C, puis la réparation la ramène à 4 °C. Le seuil haut est à 8 °C. Les mesures sont <strong>bruitées</strong> (±0,3 °C) : comparez les deux réglages.</p>
+    <figure>
+      <div class="chart-head">
+        <div class="seg" role="group" aria-label="Hystérésis">
+          <button type="button" data-h="0" aria-pressed="false">sans hystérésis</button>
+          <button type="button" data-h="1" aria-pressed="true">hystérésis 1,0 °C</button>
+        </div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+      </div>
+      <div class="fig-scroll">
+        <div class="chart-wrap">
+          <svg class="ch" id="chart" viewBox="0 0 760 330" role="img" aria-label="Température de la chambre froide pendant le scénario de 60 secondes, avec le seuil d'alarme à 8 degrés et les alarmes déclenchées."></svg>
+          <div class="tip" id="tip"></div>
+        </div>
+      </div>
+      <figcaption>Avec l'hystérésis, l'alarme se déclenche au-dessus de 8 °C mais ne retombe que <strong>sous 7 °C</strong> : le bruit ne suffit plus à la faire clignoter. Règle pratique : l'hystérésis doit dépasser deux fois l'amplitude du bruit. Courbe illustrative, calculée dans votre navigateur ; les valeurs exactes sont celles de la puce.</figcaption>
+      <details>
+        <summary class="small" style="cursor:pointer">Voir les événements sous forme de journal</summary>
+        <pre id="journal" style="margin-top:10px"></pre>
+      </details>
+    </figure>
+    <p class="note">C'est exactement le critère de fin de phase : sur ce scénario, le journal doit contenir <strong>une</strong> alarme porte, <strong>un</strong> retour de la porte, <strong>une</strong> alarme température et <strong>un</strong> retour de la température, dans cet ordre. Ni plus, ni moins. Écrivez ce test <strong>avant</strong> le moteur d'alarmes.</p>
+  </section>
+
+  <!-- ================= MQTT ================= -->
+  <section id="mqtt">
+    <h2>MQTT : qui publie quoi <span class="phase-tag">P2</span> <span class="phase-tag">P4</span></h2>
+    <pre>embedgate/gp1/
+├── mesure/0 … 3     passerelle → tous    {"ch":0,"nom":"temperature","valeur":4.12,"unite":"degC","ts":…}
+├── alarme/0 … 3     passerelle → tous    {"ch":0,"etat":"ALARME","niveau":"HAUT","valeur":8.31,…}   retenu
+├── panne/0 … 3      passerelle → tous    {"ch":1,"panne":true,"ts":…}                               retenu
+├── etat             passerelle → tous    {"etat":"en_ligne"} · testament : {"etat":"hors_ligne"}    retenu
+├── cmd              superviseur → passerelle   {"id":"7","cmd":"calib","ch":0,"decalage":-1.5}
+└── cmd/ack          passerelle → superviseur   {"id":"7","ok":true,"detail":""}</pre>
+    <p class="small">Remplacez <code>gp1</code> par votre groupe. Pour tout voir passer : <code>mosquitto_sub -t 'embedgate/gp1/#' -v</code>.</p>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 320" role="img" aria-label="Une commande de calibrage : le superviseur publie sur cmd, le broker transmet à la passerelle, qui écrit CALIB de 0 égal moins 1500 dans la puce, puis publie un accusé sur cmd/ack que le broker transmet au superviseur. Les mesures suivantes sont décalées de moins 1,5 degré.">
+          <defs><marker id="hm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+          <rect class="py" x="25" y="10" width="140" height="36" rx="6"/><text class="t" x="95" y="33" text-anchor="middle">Superviseur</text>
+          <rect class="box given" x="215" y="10" width="140" height="36" rx="6"/><text class="t" x="285" y="33" text-anchor="middle">Broker</text>
+          <rect class="cpp" x="405" y="10" width="140" height="36" rx="6"/><text class="t" x="475" y="33" text-anchor="middle">Passerelle</text>
+          <rect class="c given" x="595" y="10" width="140" height="36" rx="6"/><text class="t" x="665" y="33" text-anchor="middle">Puce</text>
+          <line class="life" x1="95" y1="46" x2="95" y2="310"/>
+          <line class="life" x1="285" y1="46" x2="285" y2="310"/>
+          <line class="life" x1="475" y1="46" x2="475" y2="310"/>
+          <line class="life" x1="665" y1="46" x2="665" y2="310"/>
+
+          <line class="edge" x1="95" y1="82" x2="281" y2="82" marker-end="url(#hm)"/>
+          <text x="190" y="75" text-anchor="middle">publie sur …/cmd</text>
+          <text class="m" x="190" y="98" text-anchor="middle">id 7 · calib · ch 0 · −1,5</text>
+
+          <line class="edge" x1="285" y1="128" x2="471" y2="128" marker-end="url(#hm)"/>
+          <text x="380" y="121" text-anchor="middle">transmet (abonné)</text>
+
+          <line class="edge" x1="475" y1="168" x2="661" y2="168" marker-end="url(#hm)"/>
+          <text x="570" y="161" text-anchor="middle">écrit CALIB[0]</text>
+          <text class="m" x="570" y="184" text-anchor="middle">−1,5 / 0,001 = −1500</text>
+
+          <line class="edge" x1="475" y1="214" x2="289" y2="214" marker-end="url(#hm)"/>
+          <text x="380" y="207" text-anchor="middle">publie …/cmd/ack</text>
+          <text class="m" x="380" y="230" text-anchor="middle">id 7 · ok</text>
+
+          <line class="edge" x1="285" y1="252" x2="99" y2="252" marker-end="url(#hm)"/>
+          <text x="190" y="245" text-anchor="middle">transmet l'ack</text>
+
+          <line class="edge dash" x1="665" y1="290" x2="99" y2="290" marker-end="url(#hm)"/>
+          <text x="380" y="283" text-anchor="middle">les mesures suivantes : 4,0 °C → 2,5 °C (via la passerelle et le broker)</text>
+        </svg>
+      </div>
+      <figcaption>Le superviseur ne parle <strong>jamais</strong> directement à la passerelle : tout passe par le broker. C'est ce qui permettra, en P5, de déplacer la passerelle sur la carte ARM sans changer une ligne du superviseur. L'<code>id</code> relie chaque accusé à sa commande. Une commande invalide reçoit <code>"ok":false</code> et ne fait jamais tomber la passerelle.</figcaption>
+    </figure>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option MQTT</th><th>Utilisée pour</th><th>Pourquoi</th></tr></thead>
+        <tbody>
+          <tr><td><strong>message retenu</strong></td><td>alarmes, pannes, état</td><td>un superviseur lancé après coup voit tout de suite la situation, sans attendre le prochain changement</td></tr>
+          <tr><td><strong>testament</strong> (<em>Last Will</em>)</td><td><code>etat</code></td><td>si la passerelle meurt sans prévenir (<code>kill -9</code>, câble arraché), le broker publie <code>hors_ligne</code> à sa place</td></tr>
+          <tr><td><strong>QoS 1</strong></td><td>alarmes, commandes</td><td>livré au moins une fois : une alarme ne doit pas se perdre</td></tr>
+          <tr><td><strong>QoS 0</strong></td><td>mesures</td><td>une mesure perdue est remplacée par la suivante 100 ms plus tard</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= CIBLE ================= -->
+  <section id="cible">
+    <h2>Sur la cible embarquée <span class="phase-tag">P5</span></h2>
+    <p class="note warn">Les détails (architecture, machine QEMU, image) seront confirmés le <strong>vendredi 9 octobre</strong>, d'après le module Linux embarqué. Le principe ci-dessous ne change pas.</p>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 300" role="img" aria-label="À gauche, le PC hôte avec le broker, le superviseur et gdb. À droite, la carte ARM émulée par QEMU, sous Linux Buildroot, avec la puce ARM fournie, la passerelle lancée au démarrage et gdbserver. La passerelle publie vers le broker de l'hôte, gdb se connecte à gdbserver, et le déploiement se fait par scp.">
+          <defs><marker id="hc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+          <rect class="box" x="20" y="20" width="300" height="260" rx="8"/>
+          <text class="t" x="36" y="42">PC hôte (x86-64, VM Debian)</text>
+          <rect class="box given" x="40" y="60" width="260" height="44" rx="5"/>
+          <text class="t" x="170" y="80" text-anchor="middle">Broker MQTT</text><text class="s" x="170" y="96" text-anchor="middle">port 1883</text>
+          <rect class="py" x="40" y="124" width="260" height="44" rx="5"/>
+          <text class="t" x="170" y="144" text-anchor="middle">Superviseur Python</text><text class="s" x="170" y="160" text-anchor="middle">inchangé depuis P4</text>
+          <rect class="box" x="40" y="188" width="260" height="44" rx="5"/>
+          <text class="t" x="170" y="208" text-anchor="middle">gdb-multiarch · scp</text><text class="s" x="170" y="224" text-anchor="middle">compilation croisée (build-arm/)</text>
+
+          <rect class="box" x="440" y="20" width="300" height="260" rx="8" style="stroke-dasharray:8 5"/>
+          <text class="t" x="456" y="42">Carte ARM émulée (QEMU)</text>
+          <text class="s" x="456" y="58">Linux Buildroot · BusyBox</text>
+          <rect class="c given" x="460" y="72" width="260" height="40" rx="5"/>
+          <text class="t" x="590" y="97" text-anchor="middle">puce (sim_capteurs ARM)</text>
+          <rect class="cpp" x="460" y="124" width="260" height="56" rx="5"/>
+          <text class="t" x="590" y="146" text-anchor="middle">embedgate-gw (ARM)</text>
+          <text class="s" x="590" y="164" text-anchor="middle">lancé au démarrage (script d'init)</text>
+          <rect class="box" x="460" y="192" width="260" height="40" rx="5"/>
+          <text class="t" x="590" y="217" text-anchor="middle">gdbserver</text>
+
+          <line class="edge" x1="460" y1="150" x2="380" y2="150"/>
+          <polyline class="edge" points="380,150 380,82 304,82" marker-end="url(#hc)"/>
+          <text class="s" x="386" y="118">MQTT vers</text>
+          <text class="m" x="386" y="133">10.0.2.2</text>
+          <line class="edge" x1="300" y1="210" x2="456" y2="210" marker-end="url(#hc)"/>
+          <text class="s" x="378" y="203" text-anchor="middle">gdb ⇄ gdbserver</text>
+          <line class="edge dash" x1="300" y1="256" x2="456" y2="256" marker-end="url(#hc)"/>
+          <text class="s" x="378" y="249" text-anchor="middle">scp (déploiement)</text>
+        </svg>
+      </div>
+      <figcaption>Vu de la carte émulée, le PC hôte s'appelle <code>10.0.2.2</code> (réseau « user » de QEMU). La puce tourne <strong>sur la carte</strong>, à côté de la passerelle, puisque ses registres sont un fichier local. Le superviseur, lui, reste sur le PC et ne voit aucune différence : c'est le bénéfice de tout faire passer par le broker.</figcaption>
+    </figure>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Vérification</th><th>Commande</th></tr></thead>
+        <tbody>
+          <tr><td>le binaire est bien ARM</td><td><code>file build-arm/embedgate-gw</code> → <code>ELF 32-bit … ARM</code></td></tr>
+          <tr><td>la passerelle a démarré seule</td><td>sur le PC : <code>mosquitto_sub -t 'embedgate/gp1/etat'</code> → <code>en_ligne</code></td></tr>
+          <tr><td>mêmes alarmes qu'en P3</td><td><code>chambre-froide.scn</code> sur la carte, puis le journal de la carte</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= CAN ================= -->
+  <section id="can">
+    <h2>Extension E1 : un nœud sur bus CAN</h2>
+    <p>Dans une voiture, un train ou un avion, les calculateurs ne partagent pas des registres : ils échangent de courtes trames sur un <strong>bus CAN</strong>. Linux en fournit un virtuel, <code>vcan0</code>, et des outils pour l'écouter (<code>candump</code>) ou y écrire (<code>cansend</code>). À faire seulement une fois le socle sur <code>main</code> ; obligatoire pour le trinôme.</p>
+    <figure>
+      <div class="fig-scroll">
+        <svg class="dg" viewBox="0 0 760 170" role="img" aria-label="Un nœud capteur distant envoie des trames sur le bus CAN virtuel vcan0. La passerelle les lit par une socket CAN et les traite comme un cinquième canal, avec ses alarmes. candump permet d'écouter le bus.">
+          <defs><marker id="hn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+          <rect class="c" x="20" y="20" width="180" height="56" rx="6"/>
+          <text class="t" x="110" y="43" text-anchor="middle">Nœud distant</text>
+          <text class="s" x="110" y="62" text-anchor="middle">cansend ou petit programme</text>
+          <line class="edge" x1="20" y1="120" x2="740" y2="120" style="stroke-width:3"/>
+          <text class="t" x="370" y="148" text-anchor="middle">vcan0</text>
+          <text class="s" x="370" y="163" text-anchor="middle">trame : identifiant 0x120 · 8 octets de données</text>
+          <line class="edge" x1="110" y1="76" x2="110" y2="117" marker-end="url(#hn)"/>
+          <rect class="cpp" x="540" y="20" width="200" height="56" rx="6"/>
+          <text class="t" x="640" y="43" text-anchor="middle">embedgate-gw</text>
+          <text class="s" x="640" y="62" text-anchor="middle">socket CAN → canal 4</text>
+          <line class="edge" x1="640" y1="117" x2="640" y2="79" marker-end="url(#hn)"/>
+          <rect class="box" x="300" y="34" width="140" height="36" rx="6"/>
+          <text class="m" x="370" y="57" text-anchor="middle">candump vcan0</text>
+          <line class="edge dash" x1="370" y1="117" x2="370" y2="73" marker-end="url(#hn)"/>
+        </svg>
+      </div>
+      <figcaption>Le format de trame (identifiant, ordre des octets, unité) est à <strong>documenter vous-mêmes</strong> dans votre README, comme le ferait une équipe qui publie la « messagerie CAN » d'un calculateur. Le canal 4 apparaît au tableau de bord et déclenche ses propres alarmes.</figcaption>
+    </figure>
+  </section>
+
+  <footer>
+    <p>Ce qui fait foi : <code>INTERFACES.md</code> (le contrat) et l'agenda des phases, dans le dépôt du projet. Ce site les illustre.</p>
+    <p>Projet final POEI LLS · AJC Formation · octobre 2026</p>
+  </footer>
+</div>
+
+<script>
+/* ---------- thème ---------- */
+(function () {
+  var root = document.documentElement;
+  try { var t = localStorage.getItem("eg-theme"); if (t) root.setAttribute("data-theme", t); } catch (e) {}
+  document.getElementById("theme").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") === "dark" ||
+      (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("eg-theme", next); } catch (e) {}
+  });
+})();
+
+/* ---------- parcours : critères par phase ---------- */
+(function () {
+  var PHASES = [
+    { id: "p1", code: "P1", cls: "c", titre: "Le pilote C", quand: "J1 – J2 · lun. 12 – mar. 13 · v0.1",
+      but: "Votre pilote démarre la puce, sert ses interruptions et détecte une panne, sur PC et sur ARM émulé.",
+      crit: ["Compilation sans aucun warning, sur PC et en croisé ARM (dès la 1re heure)",
+             "Tests du pilote verts, sans la puce (banque de registres en mémoire)",
+             "pilote_demo : les 4 canaux servis à la bonne cadence",
+             "Sans la puce lancée : message clair et code de sortie ≠ 0",
+             "Binaire ARM vérifié avec file, et qui tourne sous qemu-arm",
+             "panne-capteur.scn : la panne du canal 1 est détectée",
+             "Tag v0.1 posé"] },
+    { id: "p2", code: "P2", cls: "", titre: "La chaîne complète, en fin", quand: "J3 · mer. 14 · v0.2",
+      but: "Une mesure va de la puce jusqu'à l'écran du superviseur, via MQTT.",
+      crit: ["Le pilote C est possédé par une classe C++ (RAII, non copiable)",
+             "La connexion libmosquitto est enveloppée de la même façon",
+             "Les 4 topics de mesure reçus, JSON valide, champs du contrat",
+             "Valeurs en unité physique (≈ 4,0 °C, pas 4000)",
+             "superviseur.py minimal affiche les mesures",
+             "Ctrl-C arrête la passerelle avec le code 0",
+             "Tag v0.2 posé"] },
+    { id: "p3", code: "P3", cls: "cpp", titre: "Le cœur de la passerelle", quand: "J4 – J5 · jeu. 15 – ven. 16 · v0.3",
+      but: "Le scénario « chambre froide » produit exactement les bonnes alarmes au journal.",
+      crit: ["Test « valeur bruitée autour du seuil = une seule alarme » écrit AVANT le moteur",
+             "Deux threads au moins, reliés par une file thread-safe",
+             "Moteur d'alarmes avec hystérésis (Strategy), abonnés prévenus (Observer)",
+             "Journal au format imposé ; chambre-froide.scn : 2 alarmes, 2 retours, dans l'ordre",
+             "panne-capteur.scn : PANNE puis RETABLI",
+             "Configuration lue au démarrage (code 2 si invalide), arrêt propre sur SIGTERM",
+             "Valgrind : 0 fuite sur 30 s · ThreadSanitizer : aucune data race",
+             "rafale.scn tient 30 s · aucun new/delete nu",
+             "Tag v0.3 posé · démo au bilan de mi-parcours"] },
+    { id: "p4", code: "P4", cls: "py", titre: "Superviser et commander", quand: "J6 – J7 · lun. 19 – mar. 20 · v0.4",
+      but: "scripts/demo.sh rejoue l'incident de bout en bout, commandes comprises : DEMO OK.",
+      crit: ["Tableau de bord : valeur, état, panne par capteur, dernières alarmes",
+             "Commandes calib, reset, selftest, acquisition : effet visible + ack avec le bon id",
+             "Commande invalide : ack ok:false, la passerelle tourne toujours",
+             "Testament MQTT : kill -9 → etat hors_ligne",
+             "Alarmes retenues : un superviseur lancé en retard voit la situation",
+             "Broker relancé : les mesures reprennent sans redémarrer la passerelle",
+             "pytest vert · scripts/demo.sh → DEMO OK",
+             "Tag v0.4 posé"] },
+    { id: "p5", code: "P5", cls: "", titre: "Sur la cible embarquée", quand: "J8 – J9 · mer. 21 – jeu. 22 · v0.5",
+      but: "La passerelle tourne sur la carte ARM émulée ; le superviseur, sur le PC, la voit.",
+      crit: ["embedgate-gw et libmosquitto compilés pour ARM",
+             "Carte démarrée sous QEMU, binaires et configuration déployés",
+             "La passerelle démarre seule au boot",
+             "Les mesures de la carte arrivent au superviseur du PC",
+             "chambre-froide.scn sur la carte : mêmes alarmes qu'en P3",
+             "Session gdb ⇄ gdbserver, captures dans le rapport",
+             "Procédure de déploiement écrite dans le README",
+             "Tag v0.5 posé"] },
+    { id: "p6", code: "P6", cls: "", titre: "Finaliser", quand: "J10 · ven. 23 · v1.0",
+      but: "Socle complet sur main, extensions, dossier, soutenance répétée.",
+      crit: ["Socle complet fusionné sur main, critères des phases 1 à 5 repassés",
+             "Extensions (E1 obligatoire pour le trinôme)",
+             "README testé par un autre groupe",
+             "Dossier de 5 à 10 pages",
+             "Répétition chronométrée devant un autre groupe",
+             "Tag v1.0 avant 17 h"] }
+  ];
+  var KEY = "eg-parcours";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var host = document.getElementById("phases");
+  PHASES.forEach(function (p) {
+    var d = document.createElement("details");
+    d.className = "ph";
+    var s = document.createElement("summary");
+    s.innerHTML = '<span class="code ' + p.cls + '">' + p.code + '</span>' +
+      '<span><span class="t1">' + p.titre + '</span><br><span class="t2">' + p.quand + '</span></span>' +
+      '<span class="count"></span>';
+    d.appendChild(s);
+    var body = document.createElement("div");
+    body.className = "body";
+    var g = document.createElement("p"); g.className = "goal"; g.textContent = p.but; body.appendChild(g);
+    var ul = document.createElement("ul");
+    p.crit.forEach(function (c, i) {
+      var k = p.id + "-" + i;
+      var li = document.createElement("li");
+      var lab = document.createElement("label");
+      var inp = document.createElement("input"); inp.type = "checkbox"; inp.checked = !!state[k];
+      var sp = document.createElement("span"); sp.textContent = c;
+      inp.addEventListener("change", function () { state[k] = inp.checked; save(); count(); });
+      lab.appendChild(inp); lab.appendChild(sp); li.appendChild(lab); ul.appendChild(li);
+    });
+    body.appendChild(ul);
+    d.appendChild(body);
+    host.appendChild(d);
+    var cEl = s.querySelector(".count");
+    function count() {
+      var n = 0; p.crit.forEach(function (_, i) { if (state[p.id + "-" + i]) n++; });
+      cEl.textContent = n + " / " + p.crit.length;
+      cEl.classList.toggle("done", n === p.crit.length);
+    }
+    p.count = count; count();
+  });
+  document.getElementById("reset-checks").addEventListener("click", function () {
+    if (!confirm("Décocher toutes les cases ?")) return;
+    state = {}; save();
+    host.querySelectorAll("input").forEach(function (i) { i.checked = false; });
+    PHASES.forEach(function (p) { p.count(); });
+  });
+})();
+
+/* ---------- courbe chambre froide + hystérésis ---------- */
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("chart");
+  var tip = document.getElementById("tip");
+  var HAUT = 8.0, PERIODE = 0.1, DUREE = 60;
+
+  // Scénario chambre-froide.scn, bruit pseudo-aléatoire déterministe (graine 42).
+  var seed = 42;
+  function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  function consigne(t) {
+    if (t < 10) return 4;
+    if (t < 30) return 4 + 7 * (t - 10) / 20;
+    if (t < 36) return 11;
+    if (t < 50) return 11 - 7 * (t - 36) / 14;
+    return 4;
+  }
+  var pts = [];
+  for (var i = 0; i <= DUREE / PERIODE; i++) {
+    var t = +(i * PERIODE).toFixed(1);
+    pts.push({ t: t, v: +(consigne(t) + (rnd() * 2 - 1) * 0.3).toFixed(2) });
+  }
+
+  function evenements(h) {
+    var ev = [], on = false;
+    pts.forEach(function (p) {
+      if (!on && p.v > HAUT) { on = true; ev.push({ t: p.t, v: p.v, on: true }); }
+      else if (on && p.v < HAUT - h) { on = false; ev.push({ t: p.t, v: p.v, on: false }); }
+    });
+    return ev;
+  }
+
+  // Géométrie
+  var X0 = 52, X1 = 740, Y0 = 262, Y1 = 22, VMIN = 0, VMAX = 12;
+  function x(t) { return X0 + (X1 - X0) * t / DUREE; }
+  function y(v) { return Y0 - (Y0 - Y1) * (v - VMIN) / (VMAX - VMIN); }
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  function txt(s, attrs, parent) { var e = el("text", attrs, parent); e.textContent = s; return e; }
+
+  var layerZones, layerLines, layerEv, cross, dot;
+  function base() {
+    [0, 4, 8, 12].forEach(function (v) {
+      el("line", { "class": "grid", x1: X0, x2: X1, y1: y(v), y2: y(v) });
+      txt(v + " °C", { x: X0 - 8, y: y(v) + 4, "text-anchor": "end" });
+    });
+    [0, 10, 20, 30, 40, 50, 60].forEach(function (t) {
+      txt(t + " s", { x: x(t), y: Y0 + 18, "text-anchor": "middle" });
+    });
+    el("line", { "class": "axis", x1: X0, x2: X1, y1: Y0, y2: Y0 });
+    // porte ouverte 10 → 14 s
+    el("rect", { "class": "door", x: x(10), y: 296, width: x(14) - x(10), height: 14, rx: 3 });
+    txt("porte ouverte (alarme porte, canal 3)", { x: x(14) + 8, y: 307 });
+    txt("porte", { x: X0 - 8, y: 307, "text-anchor": "end" });
+    layerZones = el("g", {});
+    var path = pts.map(function (p, i) { return (i ? "L" : "M") + x(p.t).toFixed(1) + "," + y(p.v).toFixed(1); }).join("");
+    el("path", { "class": "series", d: path });
+    layerLines = el("g", {});
+    layerEv = el("g", {});
+    cross = el("line", { "class": "cross", y1: Y1, y2: Y0, x1: -10, x2: -10 });
+    dot = el("circle", { "class": "dot", r: 4, cx: -10, cy: -10 });
+  }
+
+  function clear(g) { while (g.firstChild) g.removeChild(g.firstChild); }
+  var current = [];
+  function draw(h) {
+    var ev = evenements(h);
+    current = ev;
+    clear(layerZones); clear(layerLines); clear(layerEv);
+    for (var i = 0; i < ev.length; i += 2) {
+      var a = ev[i].t, b = ev[i + 1] ? ev[i + 1].t : DUREE;
+      el("rect", { "class": "zone", x: x(a), y: Y1, width: Math.max(1, x(b) - x(a)), height: Y0 - Y1 }, layerZones);
+    }
+    el("line", { "class": "thr", x1: X0, x2: X1, y1: y(HAUT), y2: y(HAUT) }, layerLines);
+    txt("seuil haut 8 °C", { "class": "lab-al", x: X0 + 6, y: y(HAUT) - 6 }, layerLines);
+    if (h > 0) {
+      el("line", { "class": "ret", x1: X0, x2: X1, y1: y(HAUT - h), y2: y(HAUT - h) }, layerLines);
+      txt("retour sous " + (HAUT - h) + " °C", { x: X0 + 6, y: y(HAUT - h) + 15 }, layerLines);
+    }
+    ev.forEach(function (e) {
+      if (e.on) el("path", { "class": "ev-on", d: "M" + x(e.t) + "," + (Y1 + 2) + " l6,10 l-12,0 z" }, layerEv);
+      else el("circle", { "class": "ev-off", cx: x(e.t), cy: Y1 + 8, r: 4.5 }, layerEv);
+    });
+    var nOn = ev.filter(function (e) { return e.on; }).length;
+    var nOff = ev.length - nOn;
+    document.getElementById("verdict").innerHTML = nOn === 1
+      ? '<b class="good">1 alarme</b> température, 1 retour à la normale : conforme'
+      : '<b class="bad">' + nOn + ' alarmes</b> et ' + nOff + ' retours pour un seul incident';
+    // journal
+    var lines = ["10.0 s  ALARME ch=3 nom=porte niveau=HAUT valeur=1", "14.0 s  NORMAL ch=3 nom=porte valeur=0"];
+    ev.forEach(function (e) {
+      lines.push(e.t.toFixed(1).padStart(4) + " s  " + (e.on ? "ALARME ch=0 nom=temperature niveau=HAUT valeur=" : "NORMAL ch=0 nom=temperature valeur=") + e.v.toFixed(2));
+    });
+    lines.sort(function (a, b) { return parseFloat(a) - parseFloat(b); });
+    document.getElementById("journal").textContent = lines.join("\n");
+  }
+
+  function etatA(t) {
+    var on = false;
+    current.forEach(function (e) { if (e.t <= t) on = e.on; });
+    return on;
+  }
+  function move(clientX) {
+    var r = svg.getBoundingClientRect();
+    var vx = (clientX - r.left) * 760 / r.width;
+    if (vx < X0 || vx > X1) { hide(); return; }
+    var t = Math.round(((vx - X0) / (X1 - X0) * DUREE) / PERIODE) * PERIODE;
+    var p = pts[Math.round(t / PERIODE)];
+    cross.setAttribute("x1", x(p.t)); cross.setAttribute("x2", x(p.t));
+    dot.setAttribute("cx", x(p.t)); dot.setAttribute("cy", y(p.v));
+    var porte = p.t >= 10 && p.t < 14 ? " · porte ouverte" : "";
+    tip.innerHTML = "<b>" + p.t.toFixed(1) + " s</b> · " + p.v.toFixed(2).replace(".", ",") + " °C<br>" +
+      (etatA(p.t) ? "température en ALARME" : "température normale") + porte;
+    var px = x(p.t) * r.width / 760, py = y(p.v) * r.height / 330;
+    tip.style.left = Math.min(Math.max(px + 12, 0), r.width - 210) + "px";
+    tip.style.top = Math.max(py - 54, 0) + "px";
+    tip.classList.add("on");
+  }
+  function hide() { tip.classList.remove("on"); cross.setAttribute("x1", -10); cross.setAttribute("x2", -10); dot.setAttribute("cx", -10); }
+
+  base();
+  draw(1);
+  svg.addEventListener("pointermove", function (e) { move(e.clientX); });
+  svg.addEventListener("pointerleave", hide);
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".seg button").forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+      draw(+b.dataset.h);
+    });
+  });
+})();
+</script>
+</body>
+</html>

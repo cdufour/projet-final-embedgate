@@ -1,0 +1,26 @@
+# Projet final EmbedGate (12-26/10/2026) : mêmes groupes que pour le Projet C++
+
+[gp1]
+yohan
+mohammed
+theo
+
+[gp2]
+orialm
+antoine
+
+[gp3]
+charriere Clement
+gibril
+
+[gp4]
+clement tolsau
+gabriel
+
+[gp5]
+jean charles
+amine
+
+[gp6]
+tanguy
+matthieu

@@ -1,0 +1,16 @@
+# panne-capteur.scn : le capteur de pression tombe en panne 10 s, puis revient.
+# Attendu : PANNE ch=1 vers 5 s, RETABLI ch=1 vers 15 s, aucune alarme.
+periode 100
+duree   30
+graine  7
+
+# t(s)  canal  action   valeurs
+0       0      fixe     4.0
+0       0      bruit    0.3
+0       1      fixe     1013
+0       1      bruit    1
+0       2      fixe     500
+0       2      bruit    10
+0       3      fixe     0
+5       1      panne                 # plus de mesure ni d'interruption sur le canal 1
+15      1      retablit

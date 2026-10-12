@@ -1,0 +1,15 @@
+# rafale.scn : test de charge. Une acquisition toutes les 10 ms pendant 30 s,
+# soit 12 000 mesures. Valeurs nominales : aucune alarme attendue.
+# La passerelle doit tenir sans perte, sans blocage et sans fuite.
+periode 10
+duree   30
+graine  3
+
+# t(s)  canal  action   valeurs
+0       0      fixe     4.0
+0       0      bruit    0.3
+0       1      fixe     1013
+0       1      bruit    1
+0       2      fixe     500
+0       2      bruit    10
+0       3      fixe     0

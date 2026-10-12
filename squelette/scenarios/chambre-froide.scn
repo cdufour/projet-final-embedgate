@@ -1,0 +1,20 @@
+# chambre-froide.scn : un joint de porte cède pendant la nuit.
+# Journal attendu (seuils de config/gateway.ini) : alarme porte vers 10 s,
+# retour porte vers 14 s, alarme température vers 21 s, retour vers 44 s.
+# Exactement quatre lignes ALARME/NORMAL : ni plus, ni moins.
+periode 100
+duree   60
+graine  42
+
+# t(s)  canal  action   valeurs
+0       0      fixe     4.0
+0       0      bruit    0.3          # ± 0,3 °C autour de la consigne
+0       1      fixe     1013
+0       1      bruit    1
+0       2      fixe     500
+0       2      bruit    10
+0       3      fixe     0
+10      3      fixe     1            # la porte s'ouvre
+14      3      fixe     0            # elle se referme... mais le joint a cédé
+10      0      rampe    11.0  20     # la température monte vers 11 °C en 20 s
+36      0      rampe    4.0   14     # réparation : retour à 4 °C en 14 s

@@ -1,0 +1,9 @@
+# Dépendances Python du superviseur.
+# Sur la VM Debian : sudo apt install python3-paho-mqtt python3-pytest
+#   (Debian 12 fournit paho-mqtt 1.6). Avec pip : paho-mqtt 2.x.
+# Les deux versions diffèrent à la création du client :
+#   2.x : mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=...)
+#   1.6 : mqtt.Client(client_id=...)
+# Écrivez un code qui marche avec les deux (tester hasattr(mqtt, "CallbackAPIVersion")).
+paho-mqtt>=1.6
+pytest

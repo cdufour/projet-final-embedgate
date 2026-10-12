@@ -1,0 +1,13 @@
+# stable.scn : tout va bien, sans fin. Pour mettre au point le pilote (P1).
+periode 100          # ms entre deux acquisitions
+duree   0            # 0 = sans fin (Ctrl-C pour arrêter)
+graine  1
+
+# t(s)  canal  action   valeurs
+0       0      fixe     4.0          # température (°C)
+0       0      bruit    0.3
+0       1      fixe     1013         # pression (mbar)
+0       1      bruit    1
+0       2      fixe     500          # courant du compresseur (mA)
+0       2      bruit    10
+0       3      fixe     0            # porte fermée
