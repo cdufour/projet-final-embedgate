@@ -138,12 +138,17 @@ structure que vous passez à vos fonctions.
 
 **Deux conseils de conception** qui vous feront gagner du temps ensuite :
 
-- **Aucun `printf` ni `exit` dans la bibliothèque du pilote**, c'est-à-dire
-  dans tous les fichiers de `pilote/` **sauf `pilote_demo.c`**. Le pilote
-  renvoie des codes ; c'est le programme `pilote_demo` qui affiche et qui
-  choisit le code de sortie. La passerelle C++ de la Phase 2 réutilisera ce
-  pilote tel quel. Une fonction qui **renvoie le texte** d'un code d'erreur
-  (comme `strerror()`) est la bienvenue : c'est l'appelant qui l'affiche.
+- **Le pilote n'affiche rien et n'arrête jamais le programme de sa propre
+  initiative.** Dans la bibliothèque du pilote (tous les fichiers de
+  `pilote/` **sauf `pilote_demo.c`**), les fonctions qui travaillent
+  (ouvrir, démarrer, servir les interruptions…) ne font ni `printf` ni
+  `exit` : elles renvoient des codes. C'est le programme `pilote_demo` qui
+  affiche et qui choisit le code de sortie. La passerelle C++ de la Phase 2
+  réutilisera ce pilote tel quel.
+  Une fonction qui **renvoie le texte** d'un code d'erreur (comme
+  `strerror()`) est la bienvenue. Une fonction d'affichage (comme
+  `perror()`) est permise si **seul l'utilisateur** l'appelle, jamais le
+  pilote lui-même, et si elle n'écrit pas sur la sortie standard.
 - **Prévoyez une seconde façon d'« ouvrir »** : sur une banque de registres
   déjà en mémoire (un simple pointeur), sans passer par le bus. C'est ce
   qui rendra vos tests possibles sans la puce (étape 9).
@@ -479,7 +484,7 @@ valgrind --leak-check=full build/pilote_demo --duree 3 2>&1 | grep -E "in use at
 kill %1                                                 # 0 bytes in use, 0 errors
 ```
 
-- [ ] `pilote/` contient votre pilote ; aucun `printf` ni `exit` en dehors de `pilote_demo.c`
+- [ ] `pilote/` contient votre pilote ; ses fonctions n'affichent rien et n'appellent pas `exit` d'elles-mêmes (c'est `pilote_demo.c` qui affiche)
 - [ ] aucun avertissement à la compilation, sur PC et sur ARM
 - [ ] vos tests du pilote existent et sont verts, sur PC et sur ARM
 - [ ] `pilote_demo` : format exact, environ 50 lignes par canal en 5 s
