@@ -405,7 +405,7 @@ Tous les messages du programme (démarrage, bilan, erreurs) vont sur la
 ```bash
 build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 build/embedgate-gw --config config/gateway.ini &
-timeout 5 mosquitto_sub -t 'embedgate/gp1/#' -v | cut -d' ' -f1 | sort | uniq -c
+timeout --foreground 5 mosquitto_sub -t 'embedgate/gp1/#' -v | cut -d' ' -f1 | sort | uniq -c
 #   environ 50 messages pour chacun des 4 topics embedgate/gp1/mesure/0 … 3
 kill -INT %2; wait %2; echo "code=$?"                # arrêt immédiat, code=0
 kill %1
@@ -561,7 +561,7 @@ build/embedgate-gw --config /tmp/sans-broker.ini; echo "code=$?"  # code=4 (pas 
 
 # 3. La chaîne complète
 build/embedgate-gw --config config/gateway.ini &
-timeout 5 mosquitto_sub -t 'embedgate/gp1/#' -v | cut -d' ' -f1 | sort | uniq -c
+timeout --foreground 5 mosquitto_sub -t 'embedgate/gp1/#' -v | cut -d' ' -f1 | sort | uniq -c
 #   4 lignes, environ 50 chacune : embedgate/gp1/mesure/0 … 3
 mosquitto_sub -t 'embedgate/gp1/mesure/+' -C 4 | python3 -m json.tool --json-lines
 #   4 messages réaffichés sans erreur : ce sont des JSON valides
@@ -574,7 +574,7 @@ kill %1
 
 # 5. Pas de fuite mémoire
 build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
-timeout -s INT 5 valgrind --leak-check=full build/embedgate-gw --config config/gateway.ini 2>&1 \
+timeout --foreground -s INT 5 valgrind --leak-check=full build/embedgate-gw --config config/gateway.ini 2>&1 \
   | grep -E "definitely lost|indirectly lost|ERROR SUMMARY"
 kill %1                                                           # 0 bytes, 0 errors
 ```
@@ -607,6 +607,7 @@ du système sont sans importance.
 | la passerelle n'est pas compilée (« libmosquitto introuvable ») | sur le PC : même paquet ; sur ARM : normal jusqu'à la Phase 5 |
 | code 4 alors que le broker devrait tourner | étape 0 : `systemctl status mosquitto` ; l'hôte et le port de la configuration |
 | `mosquitto_sub` ne montre rien | étape 6 : le tableau des symptômes ; essayez `-t '#'` |
+| la commande de comptage (`timeout 5 mosquitto_sub …` suivie de `sort` et `uniq -c`) n'affiche rien, alors que sans `sort` les messages défilent | dans un terminal, `timeout` arrête aussi les commandes placées après lui dans la ligne : écrivez `timeout --foreground 5 …` |
 | des valeurs comme `4000` ou `1013000` | étape 4 : le facteur |
 | le superviseur ignore tous les messages | étape 4 : `valeur` entre guillemets, ou virgule décimale |
 | la passerelle et le superviseur se déconnectent sans arrêt | deux clients avec le même identifiant (étapes 5 et 7) |
