@@ -260,7 +260,7 @@ une fois revenus côté C++.
 **Vérifier.** Un `main` provisoire qui affiche chaque mesure reçue :
 
 ```bash
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 build/embedgate-gw --config config/gateway.ini       # 4 canaux qui défilent, comme pilote_demo
 ```
 
@@ -403,7 +403,7 @@ Tous les messages du programme (démarrage, bilan, erreurs) vont sur la
 **Vérifier.**
 
 ```bash
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 build/embedgate-gw --config config/gateway.ini &
 timeout 5 mosquitto_sub -t 'embedgate/gp1/#' -v | cut -d' ' -f1 | sort | uniq -c
 #   environ 50 messages pour chacun des 4 topics embedgate/gp1/mesure/0 … 3
@@ -555,7 +555,7 @@ cmake --build build-arm -j && ctest --test-dir build-arm     # la Phase 1 reste 
 build/embedgate-gw --config /nexiste/pas.ini; echo "code=$?"      # code=2
 pkill sim_capteurs; rm -f /tmp/embedgate_bus.bin
 build/embedgate-gw --config config/gateway.ini; echo "code=$?"    # code=3 (pas de puce)
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 sed 's/^port.*/port = 1999/' config/gateway.ini > /tmp/sans-broker.ini
 build/embedgate-gw --config /tmp/sans-broker.ini; echo "code=$?"  # code=4 (pas de broker sur ce port)
 
@@ -573,7 +573,7 @@ kill -INT %2; wait %2; echo "code=$?"                             # code=0
 kill %1
 
 # 5. Pas de fuite mémoire
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 timeout -s INT 5 valgrind --leak-check=full build/embedgate-gw --config config/gateway.ini 2>&1 \
   | grep -E "definitely lost|indirectly lost|ERROR SUMMARY"
 kill %1                                                           # 0 bytes, 0 errors

@@ -20,7 +20,7 @@ ses mesures, servir ses interruptions, voir ses pannes.
 À la fin du mardi, vous devez pouvoir montrer ceci :
 
 ```bash
-build/sim_capteurs --scenario scenarios/stable.scn &
+build/sim_capteurs --scenario scenarios/stable.scn & sleep 1
 build/pilote_demo --duree 5
 # [irq] ch=0 brut=4076
 # [irq] ch=1 brut=1013210
@@ -331,13 +331,18 @@ chaque passage. Vous retrouverez la même idée pour les alarmes en Phase 3.
 **Vérifier.**
 
 ```bash
-build/sim_capteurs --scenario scenarios/panne-capteur.scn --vite 4 --silencieux &
+build/sim_capteurs --scenario scenarios/panne-capteur.scn --vite 4 --silencieux & sleep 1
 build/pilote_demo --duree 10 | grep -v '^\[irq\]'
 # [panne] ch=1
 # [retabli] ch=1          une seule fois chacun
 ```
 
 Pendant la panne, le canal 1 ne doit plus produire de ligne `[irq]`.
+
+`pilote_demo` s'arrête ici au bout d'environ 7,5 s, avant les 10 s
+demandées : c'est normal. Le scénario dure 30 s, joué 4 fois plus vite ;
+à sa fin la puce s'arrête (`ID` à 0) et votre programme le voit (étape 6).
+`--duree` est une durée **maximale**. Code de sortie : 0.
 
 ---
 
@@ -417,7 +422,7 @@ ctest --test-dir build --output-on-failure     # tout est vert
 cmake --build build-arm -j
 ctest --test-dir build-arm                                   # vos tests, en ARM
 file build-arm/pilote_demo                                   # … ARM …
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 qemu-arm build-arm/pilote_demo --duree 3 | grep -c '^\[irq\]'   # ≈ 120
 ```
 
@@ -467,19 +472,19 @@ rm -f /tmp/embedgate_bus.bin
 build/pilote_demo --duree 1; echo "code=$?"             # message clair, code ≠ 0
 
 # 3. Avec la puce : la cadence, sur PC et sur ARM
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 build/pilote_demo --duree 5 | grep -c '^\[irq\]'        # ≈ 200
 build/pilote_demo --duree 5 | grep -c 'ch=2 '           # ≈ 50
 qemu-arm build-arm/pilote_demo --duree 3 | grep -c '^\[irq\]'   # ≈ 120
 kill %1
 
 # 4. La panne
-build/sim_capteurs --scenario scenarios/panne-capteur.scn --vite 4 --silencieux &
+build/sim_capteurs --scenario scenarios/panne-capteur.scn --vite 4 --silencieux & sleep 1
 build/pilote_demo --duree 10 | grep -v '^\[irq\]'       # [panne] ch=1 puis [retabli] ch=1
 kill %1 2>/dev/null
 
 # 5. Pas de fuite mémoire
-build/sim_capteurs --scenario scenarios/stable.scn --silencieux &
+build/sim_capteurs --scenario scenarios/stable.scn --silencieux & sleep 1
 valgrind --leak-check=full build/pilote_demo --duree 3 2>&1 | grep -E "in use at exit|ERROR SUMMARY"
 kill %1                                                 # 0 bytes in use, 0 errors
 ```
@@ -501,6 +506,7 @@ kill %1                                                 # 0 bytes in use, 0 erro
 | Symptôme | Où regarder |
 |---|---|
 | `pilote_demo` dit que la puce est absente alors qu'elle tourne | la puce et le pilote utilisent-ils le même bus ? (variable `EG_BUS_PATH`, chemin par défaut `/tmp/embedgate_bus.bin`) |
+| « mauvaise signature » juste après avoir (re)lancé la puce | deux causes. **Trop tôt** : la puce écrit `ID` en dernier, laissez-lui une seconde (`sleep 1`) avant de lancer votre programme. **Une ancienne puce tourne encore** en arrière-plan : en s'arrêtant, elle remet `ID` à 0 sous les pieds de la nouvelle. `pgrep -a sim_capteurs` pour le voir, `pkill sim_capteurs` puis relancez-en **une** |
 | la puce reste « en veille » | étape 3 : `ENABLE` |
 | aucune ligne `[irq]` | étape 3 : `IRQ_ENABLE` ; étape 5 : lisez-vous bien `IRQ_STATUS` ? |
 | dix fois trop de lignes | étape 5 : l'acquittement (`IRQ_ACK`, écrire 1) |
