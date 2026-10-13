@@ -33,3 +33,15 @@ est dans [`squelette/README.md`](squelette/README.md).
 
 Pour récupérer plus tard les ajouts de ce dépôt : `git pull` dans
 `projet-final-embedgate/`.
+
+## Donner accès au formateur
+
+Le dépôt de votre groupe est sur GitLab. Ajoutez-y le formateur avec le rôle
+**Reporter** (*Manage → Members → Invite members*) :
+
+- compte GitLab : **`@cdufour1`** (nom affiché : « Opusidea ») ;
+- attention, `cdufour` tout court est une autre personne sur GitLab (c'est
+  le nom du compte **GitHub** du formateur, celui de ce dépôt).
+
+Puis **envoyez l'adresse de votre dépôt au formateur** (une par groupe) :
+GitLab ne le prévient pas quand vous l'ajoutez.
