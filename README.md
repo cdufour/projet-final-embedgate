@@ -15,6 +15,7 @@ d'anomalie, affiche un tableau de bord et tourne sur une cible ARM émulée.
 | [`squelette/INTERFACES.md`](squelette/INTERFACES.md) | Le contrat technique (registres, MQTT, journal, programmes). Il fait foi |
 | [`phase1-instructions.md`](phase1-instructions.md) | La Phase 1 pas à pas : les étapes, comment vérifier chacune, les pièges, la checklist de fin de phase |
 | [`phase2-instructions.md`](phase2-instructions.md) | La Phase 2 pas à pas : de la puce au superviseur, les bibliothèques autorisées, les pièges, la checklist de fin de phase |
+| [`phase3-instructions.md`](phase3-instructions.md) | La Phase 3 pas à pas : alarmes avec hystérésis, journal, deux threads et leur file, arrêt propre, Valgrind et ThreadSanitizer, la checklist de fin de phase |
 | [`groupes.txt`](groupes.txt) | La composition des groupes |
 | [EmbedGate en schémas](https://ajc.opusidea.fr/embedgate/) | Le site compagnon : le projet expliqué en schémas (source : [`site/`](site/)) |
 
