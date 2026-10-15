@@ -290,6 +290,9 @@ sur `main`.
 
 ## Extensions (seulement une fois le socle sur `main`)
 
+Le détail de chaque extension (règles communes, quand la commencer, ce
+qu'on montre) est dans [`extensions-instructions.md`](extensions-instructions.md).
+
 | Code | Extension | Ce qu'on peut montrer |
 |---|---|---|
 | **E1** | **Bus CAN** : un nœud capteur distant envoie ses mesures sur un bus CAN virtuel (SocketCAN, `vcan0`) ; la passerelle les intègre comme un 5ᵉ canal | `cansend` / `candump`, la mesure CAN apparaît au tableau de bord et déclenche ses alarmes |
