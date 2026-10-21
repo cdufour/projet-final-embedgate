@@ -476,6 +476,22 @@ cadence ? Les compteurs affichés à l'arrêt (mesures reçues, perdues, file
 au plus…) répondent. Notez-les dans `JOURNAL.md` : c'est un résultat
 chiffré pour la présentation.
 
+Si votre passerelle n'affiche pas encore ce bilan, ajoutez-le : c'est
+petit.
+
+- **mesures reçues** : un compteur, augmenté à chaque dépôt dans la file ;
+- **file au plus** : dans `deposer`, sous le verrou déjà pris, la plus
+  grande taille atteinte ;
+- **perdues** : les dépôts refusés, si la file est bornée. Avec une file
+  sans limite, c'est 0 par construction, et c'est « file au plus » qui
+  parle : quelques éléments, tout va bien ; si elle grimpe sans arrêt, le
+  traitement ne suit pas ;
+- **une ligne sur la sortie d'erreur à l'arrêt**, une fois les threads
+  arrêtés, par exemple
+  `arrêt (SIGINT) : 3488 mesures reçues, 0 perdue(s), file au plus 50`.
+
+Relevez-les à `--vite 4` puis à vitesse 1.
+
 ---
 
 ## Étape 8 — Le débogage croisé (piste B)

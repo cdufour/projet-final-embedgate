@@ -49,8 +49,11 @@ ou vendredi matin pendant qu'un membre finit le socle.
 
 ### Une trame suggérée
 
-Voici une trame en 15 diapositives. Ce n'est qu'une proposition : le
-contenu, la mise en forme et l'outil sont à vous.
+Voici une trame en 15 diapositives. Un modèle vide la met en forme :
+[`soutenance/modele-presentation.pdf`](soutenance/modele-presentation.pdf).
+Chaque bloc n'y donne qu'un exemple : tout ce qui est entre `[crochets]`
+est à écrire par vous. Ce n'est qu'une proposition : le contenu, la mise
+en forme et l'outil sont à vous.
 
 | # | Diapositive | Ce que le jury doit y trouver |
 |---|---|---|
