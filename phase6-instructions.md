@@ -47,12 +47,10 @@ ou vendredi matin pendant qu'un membre finit le socle.
 
 ## La présentation
 
-### Le modèle
+### Une trame suggérée
 
-Un modèle de 15 diapositives vous est fourni :
-[`soutenance/modele-presentation.pdf`](soutenance/modele-presentation.pdf).
-Il propose une trame, pas un texte à recopier : tout ce qui est entre
-`[crochets]` est à remplacer par ce que **vous** avez fait.
+Voici une trame en 15 diapositives. Ce n'est qu'une proposition : le
+contenu, la mise en forme et l'outil sont à vous.
 
 | # | Diapositive | Ce que le jury doit y trouver |
 |---|---|---|
@@ -90,11 +88,12 @@ fait**. Une présentation personnalisée, c'est :
 - **vos limites**, dites honnêtement : un consultant sait ce que son
   logiciel ne fait pas encore ;
 - **votre mise en forme**, si vous le souhaitez : couleurs, ordre,
-  schémas. Le modèle est une proposition.
+  schémas. La trame est une proposition.
 
-À éviter : un texte du modèle laissé tel quel, un `[crochet]` oublié, une
-diapositive qui ne parle de rien que vous ayez fait. Le jury lit les six
-présentations à la suite : il verra tout de suite ce qui a été recopié.
+À éviter : des phrases générales, qui vaudraient pour n'importe quel
+groupe, et une diapositive qui ne parle de rien que vous ayez fait. Le
+jury lit les six présentations à la suite : il verra tout de suite ce qui
+se ressemble.
 
 ### La diapositive « L'équipe »
 
@@ -206,7 +205,7 @@ est à jour, le tag `v1.0` est poussé.
 - [ ] socle complet fusionné sur `main`, critères des phases 1 à 5 repassés
 - [ ] extensions (au moins deux, au choix, pour le trinôme)
 - [ ] `soutenance/EmbedGate-gpN.pdf` poussé sur `main` **avant 14 h**, et annoncé sur Discord
-- [ ] la présentation se comprend sans vous, sans aucun `[crochet]` ni texte du modèle laissé tel quel
+- [ ] la présentation se comprend sans vous, et chaque diapositive parle de ce que **vous** avez fait
 - [ ] la diapositive « L'équipe », avec un micro-CV par membre
 - [ ] des chiffres et des captures de **votre** dépôt
 - [ ] accès en lecture au dépôt donné au groupe partenaire **dès jeudi**
