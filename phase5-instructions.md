@@ -474,7 +474,7 @@ venues de la carte.
 est émulée, donc **plus lente** qu'une vraie. La passerelle tient-elle la
 cadence ? Les compteurs affichés à l'arrêt (mesures reçues, perdues, file
 au plus…) répondent. Notez-les dans `JOURNAL.md` : c'est un résultat
-chiffré pour le dossier.
+chiffré pour la présentation.
 
 ---
 
@@ -507,7 +507,7 @@ gdb-multiarch build-arm/embedgate-gw
 
 **Le livrable** : une **capture** (texte copié, ou image) de la session,
 avec le point d'arrêt atteint, la pile d'appels et la banque de registres
-lue en mémoire. Elle ira dans le dossier de projet (Phase 6), avec deux
+lue en mémoire. Elle ira dans la présentation (Phase 6), avec deux
 phrases d'explication.
 
 **Pièges.**

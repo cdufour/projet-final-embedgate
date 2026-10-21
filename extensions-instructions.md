@@ -260,8 +260,8 @@ scripts/qualite.sh
 ```
 
 Objectifs chiffrés : **moteur d'alarmes ≥ 90 %** des lignes couvertes,
-l'ensemble ≥ 70 %. Notez les chiffres dans `JOURNAL.md` : ils serviront au
-dossier (« résultats chiffrés »).
+l'ensemble ≥ 70 %. Notez les chiffres dans `JOURNAL.md` : ils serviront à la
+présentation (« résultats chiffrés »).
 
 **Et la CI GitLab ?** Facultative. Si vous en faites une, elle appelle
 **le même** `scripts/qualite.sh` (une seule vérité), sur les merge

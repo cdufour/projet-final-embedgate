@@ -240,7 +240,7 @@ l'intérieur de votre code, vous êtes libres.
 | Python | superviseur, MQTT, `pytest` |
 | Débogage | Valgrind, gdb, AddressSanitizer, ThreadSanitizer |
 | Linux embarqué / Buildroot / ARM | compilation croisée, image cible, QEMU, débogage croisé |
-| Savoir-être et soutenance | journal de bord, dossier, démonstration devant un jury |
+| Savoir-être et soutenance | journal de bord, présentation, démonstration devant un jury |
 
 ## B.4 Organisation : six phases
 
@@ -255,7 +255,7 @@ En résumé :
 | **P3** Le cœur de la passerelle | J4 – J5 | jeu. 15 – ven. 16 | « chambre froide » produit exactement les bonnes alarmes au journal | `v0.3` |
 | **P4** Superviser et commander | J6 – J7 | lun. 19 – mar. 20 | `scripts/demo.sh` rejoue l'incident, commandes comprises | `v0.4` |
 | **P5** Sur la cible embarquée | J8 – J9 | mer. 21 – jeu. 22 | la passerelle tourne sur la carte ARM émulée | `v0.5` |
-| **P6** Finaliser | J10 | ven. 23 | socle sur `main`, extensions, dossier, soutenance répétée | `v1.0` |
+| **P6** Finaliser | J10 | ven. 23 | socle sur `main`, extensions, présentation, soutenance répétée | `v1.0` |
 | Soutenance | | lun. 26 | devant le jury | |
 
 Chaque phase se termine par **quelque chose qui s'exécute**, et par une
@@ -276,8 +276,9 @@ critères sont remplis ; le formateur les vérifie automatiquement sur votre
    déploiement, écrite dans le README et rejouable par quelqu'un d'autre.
 5. **La documentation** : `README.md` (installer, compiler, lancer,
    déployer), `JOURNAL.md` (journal de bord, une ligne par jour au moins),
-   **dossier de projet** de 5 à 10 pages (architecture, choix, difficultés,
-   résultats chiffrés, limites).
+   **présentation du projet**, en PDF, remise le vendredi 23 à 14 h
+   (architecture, choix, difficultés, résultats chiffrés, limites, et
+   l'équipe).
 6. **La soutenance**, avec une **démonstration en direct** de la chaîne
    complète.
 
@@ -293,7 +294,7 @@ critères sont remplis ; le formateur les vérifie automatiquement sur votre
 | **Tests et TDD** | tests de chaque composant, démarche, tests verts |
 | **Débogage et qualité** | Valgrind, sanitizers, gdb, aucune fuite, aucune *data race* |
 | **Embarqué (Buildroot, QEMU, compilation croisée)** | binaires ARM, exécution sur la cible, démarrage automatique |
-| **Git et documentation** | historique, README, journal de bord, dossier |
+| **Git et documentation** | historique, README, journal de bord, présentation |
 | **Soutenance et savoir-être** | clarté, démonstration, posture de consultant |
 
 La **pondération** des critères vous sera communiquée ultérieurement.
