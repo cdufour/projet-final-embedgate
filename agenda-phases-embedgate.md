@@ -61,7 +61,7 @@ binômes.
 | **P3** Le cœur de la passerelle | J4 – J5 | jeu. 15 – ven. 16 | le scénario « chambre froide » produit exactement les bonnes alarmes au journal | `v0.3` |
 | **P4** Superviser et commander | J6 – J7 | lun. 19 – mar. 20 | `scripts/demo.sh` rejoue l'incident de bout en bout, commandes comprises : `DEMO OK` | `v0.4` |
 | **P5** Sur la cible embarquée | J8 – J9 | mer. 21 – jeu. 22 | la passerelle tourne sur la carte ARM émulée et le superviseur, sur le PC, la voit | `v0.5` |
-| **P6** Finaliser | J10 | ven. 23 | socle complet sur `main`, extensions, présentation, soutenance répétée | `v1.0` |
+| **P6** Finaliser | J10 | ven. 23 | socle complet sur `main`, extensions, présentation, répétition facultative | `v1.0` |
 | Soutenance | — | lun. 26 | devant le jury | |
 
 Le vendredi 16 au soir, on fait un **bilan de mi-parcours** : chaque groupe
@@ -284,7 +284,8 @@ sur `main`.
 - La **présentation** du groupe, en PDF, **remise à 14 h** : architecture,
   choix, difficultés, résultats chiffrés, limites, et un micro-CV par
   membre. Le détail est dans [`phase6-instructions.md`](phase6-instructions.md).
-- **Répétition chronométrée** de la soutenance devant un autre groupe.
+- **Répétition chronométrée** de la soutenance devant un autre groupe :
+  facultative, entre groupes volontaires.
 - **Tag `v1.0` avant 17 h.** C'est lui qui est évalué.
 
 ---
@@ -312,3 +313,5 @@ Le trinôme réalise au moins **deux extensions, au choix**.
 L'état du dépôt au tag **`v1.0`** (les vérifications des 5 phases
 repassées), le journal de bord, la présentation et la soutenance. La grille
 détaillée est dans l'énoncé (partie B.6).
+Seule exception : un tag `v1.0.1` le lundi avant midi, qui ne modifie que
+le `README.md` (voir [`phase6-instructions.md`](phase6-instructions.md)).

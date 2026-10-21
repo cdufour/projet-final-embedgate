@@ -255,7 +255,7 @@ En résumé :
 | **P3** Le cœur de la passerelle | J4 – J5 | jeu. 15 – ven. 16 | « chambre froide » produit exactement les bonnes alarmes au journal | `v0.3` |
 | **P4** Superviser et commander | J6 – J7 | lun. 19 – mar. 20 | `scripts/demo.sh` rejoue l'incident, commandes comprises | `v0.4` |
 | **P5** Sur la cible embarquée | J8 – J9 | mer. 21 – jeu. 22 | la passerelle tourne sur la carte ARM émulée | `v0.5` |
-| **P6** Finaliser | J10 | ven. 23 | socle sur `main`, extensions, présentation, soutenance répétée | `v1.0` |
+| **P6** Finaliser | J10 | ven. 23 | socle sur `main`, extensions, présentation, répétition facultative | `v1.0` |
 | Soutenance | | lun. 26 | devant le jury | |
 
 Chaque phase se termine par **quelque chose qui s'exécute**, et par une

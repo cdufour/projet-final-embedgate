@@ -37,8 +37,15 @@ de vous.
 | matin | socle complet fusionné sur `main`, critères des phases 1 à 5 repassés, extensions si le temps le permet |
 | **14 h** | **présentation remise** (PDF, voir plus bas) |
 | 14 h – 15 h | échange de README avec le groupe partenaire |
-| après-midi | README corrigé d'après les remarques, répétition chronométrée devant un autre groupe |
+| après-midi | README corrigé d'après les remarques ; si vous le souhaitez, répétition chronométrée devant un autre groupe |
 | **17 h** | **tag `v1.0` poussé**. C'est lui qui est évalué |
+
+**En cas de retard, le lundi 26 au matin sert de tampon** pour l'échange
+de README et pour la répétition chronométrée : vous pouvez les y
+reporter, en accord avec le groupe partenaire. La remise de la
+présentation (vendredi 14 h) et le tag `v1.0` (vendredi 17 h), eux, ne
+bougent pas. Seule exception : un tag `v1.0.1` le lundi avant midi, pour
+le README seul (voir « Le README testé »).
 
 Ne gardez pas la présentation pour la fin : commencez-la dès jeudi soir,
 ou vendredi matin pendant qu'un membre finit le socle.
@@ -132,7 +139,7 @@ naissance. C'est une présentation professionnelle, pas un CV complet.
    poussée ».
 
 La version de 14 h est celle que le jury lira. Vous pouvez encore
-l'améliorer pour lundi après la répétition, mais **le jury aura lu
+l'améliorer pour lundi, mais **le jury aura lu
 celle-ci** : remettez une version complète, pas un brouillon.
 
 ---
@@ -183,9 +190,17 @@ endroit où vous avez bloqué : l'étape, la commande, ce que vous attendiez
 et ce qui s'est passé. Vous corrigez ensuite votre propre README d'après
 le retour que vous avez reçu.
 
-### La répétition chronométrée
+En retard vendredi ? Reportez l'échange au lundi matin, en accord avec le
+groupe partenaire. Vous corrigez alors votre README après le tag `v1.0` :
+posez un tag **`v1.0.1` le lundi avant midi**, qui ne modifie **que le
+`README.md`**. Tout autre changement après `v1.0` ne sera pas pris en
+compte.
 
-Devant un autre groupe, dans les conditions de lundi :
+### La répétition chronométrée (facultative)
+
+C'est une suggestion, pas une obligation. Les groupes qui le souhaitent
+s'entendent entre eux pour répéter l'un devant l'autre, dans les
+conditions de lundi :
 
 - **15 minutes**, démonstration comprise (5 à 7 minutes) ;
 - **sur BBB**, en partage d'écran, comme lundi : vérifiez le son, la
@@ -194,7 +209,8 @@ Devant un autre groupe, dans les conditions de lundi :
   y compris sur les briques qu'il n'a pas portées.
 
 Le groupe spectateur chronomètre et note ce qui n'était pas clair. Vous
-corrigerez votre présentation d'après ses remarques.
+corrigerez votre présentation d'après ses remarques. Pas le temps
+vendredi ? Le lundi matin convient aussi.
 
 ### Le tag `v1.0`
 
@@ -213,5 +229,4 @@ est à jour, le tag `v1.0` est poussé.
 - [ ] des chiffres et des captures de **votre** dépôt
 - [ ] accès en lecture au dépôt donné au groupe partenaire **dès jeudi**
 - [ ] README suivi par le groupe partenaire, retour écrit reçu, README corrigé
-- [ ] répétition chronométrée faite devant un autre groupe
 - [ ] `passerelle/Version.cpp` annonce `1.0.0`, tag `v1.0` poussé **avant 17 h**, `JOURNAL.md` tenu
