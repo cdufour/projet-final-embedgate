@@ -165,6 +165,7 @@ wget https://buildroot.org/downloads/buildroot-2026.02.3.tar.gz && tar xzf build
 cd buildroot-2026.02.3
 make O=~/br-lab/build-carte BR2_EXTERNAL=~/<votre-dépôt>/carte qemu_arm_vexpress_defconfig
 make O=~/br-lab/build-carte menuconfig     # les options du tableau
+mkdir -p ~/<votre-dépôt>/carte/configs     # savedefconfig ne crée pas le dossier
 make O=~/br-lab/build-carte savedefconfig BR2_DEFCONFIG=~/<votre-dépôt>/carte/configs/embedgate_qemu_defconfig
 make O=~/br-lab/build-carte                # long : lancez-le dans tmux
 ```
