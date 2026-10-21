@@ -235,6 +235,20 @@ mosquitto_sub -h 10.0.2.2 -t '#' -C 1 -W 5  # si mosquitto est sur la carte : le
 ssh -p 2222 root@localhost                  # on entre sur la carte
 ```
 
+**La trace, dans `JOURNAL.md`.** Dès que la carte a démarré sur **votre**
+image, collez dans `JOURNAL.md` (puis commit et push) la sortie de ces
+trois commandes, **tapées sur la carte** :
+
+```bash
+uname -a          # armv7l, et la date de compilation de votre noyau
+cat /etc/issue    # la bannière choisie dans menuconfig
+hostname          # le nom d'hôte choisi dans menuconfig
+```
+
+L'image elle-même ne va jamais dans Git (plusieurs Go) : ces trois lignes
+sont la preuve, visible dans le dépôt, que votre recette a donné une carte
+qui démarre. Avec l'image de secours, collez-les aussi, en le précisant.
+
 ---
 
 ## Étape 3 — `libmosquitto` pour ARM (piste B)
@@ -568,6 +582,7 @@ python3 superviseur/commande.py --config config/gateway.ini selftest; echo "code
 - [ ] tous les tests verts, sur PC **et sous `qemu-arm`**, passerelle comprise ; `DEMO OK` sur le PC
 - [ ] `file` dit `ELF 32-bit … ARM` pour `pilote_demo` et `embedgate-gw`
 - [ ] l'image se reconstruit à partir de `carte/` (la `defconfig` et l'*overlay* sont dans Git)
+- [ ] `JOURNAL.md` contient `uname -a`, `cat /etc/issue` et `hostname`, tapés sur la carte (étape 2)
 - [ ] la carte démarre, la passerelle se lance **seule**, même si le broker arrive après
 - [ ] le superviseur, sur le PC, montre les mesures de la carte ; une commande reçoit son `ack`
 - [ ] `chambre-froide.scn` sur la carte : les mêmes alarmes qu'en Phase 3
