@@ -295,14 +295,14 @@ qu'on montre) est dans [`extensions-instructions.md`](extensions-instructions.md
 
 | Code | Extension | Ce qu'on peut montrer |
 |---|---|---|
-| **E1** | **Bus CAN** : un nœud capteur distant envoie ses mesures sur un bus CAN virtuel (SocketCAN, `vcan0`) ; la passerelle les intègre comme un 5ᵉ canal | `cansend` / `candump`, la mesure CAN apparaît au tableau de bord et déclenche ses alarmes |
+| E1 | Bus CAN : un nœud capteur distant envoie ses mesures sur un bus CAN virtuel (SocketCAN, `vcan0`) ; la passerelle les intègre comme un 5ᵉ canal | `cansend` / `candump`, la mesure CAN apparaît au tableau de bord et déclenche ses alarmes |
 | E2 | Tableau de bord web (mise à jour en direct) | navigateur ouvert pendant la démo |
 | E3 | Historisation SQLite + export CSV | courbe de l'incident reconstituée après coup |
 | E4 | Alarme temporisée : la porte ouverte n'alarme qu'après N secondes | scénario « livraison » sans fausse alerte |
 | E5 | Qualité : CI locale, `cppcheck`, couverture `gcov`, Doxygen | rapports générés par une seule commande |
 | E6 | Paquet Debian de la passerelle, service `systemd` sur le PC | `apt install ./embedgate.deb` puis `systemctl status` |
 
-Le trinôme réalise au moins **E1**.
+Le trinôme réalise au moins **deux extensions, au choix**.
 
 ---
 

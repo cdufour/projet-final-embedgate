@@ -106,8 +106,9 @@ C++ et une piste système. À la soutenance, chacun peut être interrogé sur
 n'importe quelle partie, y compris « comment la passerelle démarre-t-elle
 sur la carte ? ».
 
-**Trinôme** : une troisième piste, le **débogage croisé** (étape 8) et la
-préparation de l'extension E1 (`vcan0`).
+**Trinôme** : une troisième piste, le **débogage croisé** (étape 8), puis
+la préparation de ses deux extensions (au choix, voir
+[`extensions-instructions.md`](extensions-instructions.md)).
 
 **Les fichiers communs** : `README.md` et `JOURNAL.md`, un seul rédacteur à
 la fois (comme en Phase 4). Rien à changer dans `CMakeLists.txt`.

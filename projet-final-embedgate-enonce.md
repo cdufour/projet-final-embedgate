@@ -308,14 +308,14 @@ Les extensions ne comptent que si le **socle est complet et fusionné sur
 
 | Code | Extension |
 |---|---|
-| **E1** | **Bus CAN** : un nœud capteur distant sur un bus CAN virtuel (SocketCAN), intégré comme un 5ᵉ canal |
+| E1 | Bus CAN : un nœud capteur distant sur un bus CAN virtuel (SocketCAN), intégré comme un 5ᵉ canal |
 | E2 | Tableau de bord web, mis à jour en direct |
 | E3 | Historisation SQLite et export CSV |
 | E4 | Alarme temporisée (la porte n'alarme qu'après N secondes) |
 | E5 | Qualité : CI locale, `cppcheck`, couverture `gcov`, Doxygen |
 | E6 | Paquet Debian de la passerelle, service `systemd` |
 
-Le trinôme réalise au moins **E1**.
+Le trinôme réalise au moins **deux extensions, au choix**.
 
 ## B.8 Règles
 
