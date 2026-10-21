@@ -17,6 +17,7 @@ d'anomalie, affiche un tableau de bord et tourne sur une cible ARM émulée.
 | [`phase2-instructions.md`](phase2-instructions.md) | La Phase 2 pas à pas : de la puce au superviseur, les bibliothèques autorisées, les pièges, la checklist de fin de phase |
 | [`phase3-instructions.md`](phase3-instructions.md) | La Phase 3 pas à pas : alarmes avec hystérésis, journal, deux threads et leur file, arrêt propre, Valgrind et ThreadSanitizer, la checklist de fin de phase |
 | [`phase4-instructions.md`](phase4-instructions.md) | La Phase 4 pas à pas : état en ligne et testament MQTT, commandes, reconnexion au broker, tableau de bord, `commande.py`, `pytest`, `scripts/demo.sh`, la checklist de fin de phase |
+| [`phase5-instructions.md`](phase5-instructions.md) | La Phase 5 pas à pas : l'image Buildroot de la carte ARM 32 bits, `libmosquitto` et la passerelle pour ARM, le déploiement, le démarrage automatique, la chambre froide sur la carte, le débogage croisé, la checklist de fin de phase |
 | [`extensions-instructions.md`](extensions-instructions.md) | Les extensions pas à pas : règles communes, quand les commencer, E3 (SQLite), E4 (alarme temporisée), E5 (qualité) détaillées |
 | [`groupes.txt`](groupes.txt) | La composition des groupes |
 | [EmbedGate en schémas](https://ajc.opusidea.fr/embedgate/) | Le site compagnon : le projet expliqué en schémas (source : [`site/`](site/)) |
