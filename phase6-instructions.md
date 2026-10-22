@@ -156,6 +156,24 @@ passerelle qui se lance seule. Les extensions ne viennent qu'ensuite (voir
 
 ### Le README testé par un autre groupe
 
+**Votre README, pas celui du squelette.** Le `README.md` reçu au début
+du projet n'était qu'un point de départ. Vendredi, il doit s'adresser à
+quelqu'un qui découvre votre projet et contenir tout ce qu'il doit taper,
+dans l'ordre. Un seul fichier, à la racine. Un plan qui marche bien :
+
+1. ce que c'est (trois lignes) ;
+2. installer (les paquets) ;
+3. compiler et tester, pour le PC et pour ARM ;
+4. lancer sur le PC et vérifier (`scripts/demo.sh` → `DEMO OK`) ;
+5. « Sur la carte embarquée » : la section de l'étape 9 de la Phase 5 ;
+6. dépannage : les erreurs que vous avez rencontrées et leur solution.
+
+Ce qui ne sert plus est à retirer ou à réécrire : le titre « squelette du
+projet », la section « Vérifier une phase », le tableau « fourni / à
+écrire », la ligne « 2 tests fournis ». `INTERFACES.md` reste à part (le
+contrat) et le README peut y renvoyer. Vos choix techniques et vos
+difficultés vont dans la présentation, l'historique dans `JOURNAL.md`.
+
 C'est la preuve d'un critère de l'énoncé : votre procédure est
 **rejouable par quelqu'un d'autre**. De 14 h à 15 h, chaque groupe suit
 le README de son groupe partenaire, **à la lettre**, sur sa propre VM, et
@@ -228,5 +246,6 @@ est à jour, le tag `v1.0` est poussé.
 - [ ] la diapositive « L'équipe », avec un micro-CV par membre
 - [ ] des chiffres et des captures de **votre** dépôt
 - [ ] accès en lecture au dépôt donné au groupe partenaire **dès jeudi**
+- [ ] README réécrit pour un utilisateur (plus rien du squelette qui ne serve)
 - [ ] README suivi par le groupe partenaire, retour écrit reçu, README corrigé
 - [ ] `passerelle/Version.cpp` annonce `1.0.0`, tag `v1.0` poussé **avant 17 h**, `JOURNAL.md` tenu
