@@ -223,7 +223,7 @@ C'est une suggestion, pas une obligation. Les groupes qui le souhaitent
 s'entendent entre eux pour répéter l'un devant l'autre, dans les
 conditions de lundi :
 
-- **15 minutes**, démonstration comprise (5 à 7 minutes) ;
+- **15 minutes**, démonstration comprise (5 à 7 minutes, à titre indicatif) ;
 - **sur BBB**, en partage d'écran, comme lundi : vérifiez le son, la
   fenêtre partagée et la taille de la police dans les terminaux ;
 - puis 10 minutes de questions du groupe spectateur, posées à **chacun**,
