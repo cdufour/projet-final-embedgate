@@ -286,7 +286,8 @@ sur `main`.
   membre. Le détail est dans [`phase6-instructions.md`](phase6-instructions.md).
 - **Répétition chronométrée** de la soutenance devant un autre groupe :
   facultative, entre groupes volontaires.
-- **Tag `v1.0` avant 17 h.** C'est lui qui est évalué.
+- **Vendredi 17 h : tout est poussé**, même inachevé. **Tag `v1.0` le lundi 26
+  avant midi**. C'est lui qui est évalué.
 
 ---
 
@@ -313,5 +314,5 @@ Le trinôme réalise au moins **deux extensions, au choix**.
 L'état du dépôt au tag **`v1.0`** (les vérifications des 5 phases
 repassées), le journal de bord, la présentation et la soutenance. La grille
 détaillée est dans l'énoncé (partie B.6).
-Seule exception : un tag `v1.0.1` le lundi avant midi, qui ne modifie que
-le `README.md` (voir [`phase6-instructions.md`](phase6-instructions.md)).
+Le tag `v1.0` peut être posé jusqu'au lundi 26 avant midi (voir
+[`phase6-instructions.md`](phase6-instructions.md)).

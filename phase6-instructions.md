@@ -1,11 +1,15 @@
 # EmbedGate — Phase 6 pas à pas : finaliser
 
-**Vendredi 23 octobre 2026 · présentation remise à 14 h · tag `v1.0` avant 17 h**
+**Vendredi 23 octobre 2026 · présentation remise à 14 h · tag `v1.0` lundi 26 avant midi**
 
 > Ce document détaille la Phase 6 de l'[agenda](agenda-phases-embedgate.md),
 > avec un changement : **le dossier de 5 à 10 pages est remplacé par la
-> présentation de votre groupe**, à remettre **vendredi à 14 h**. Le reste
-> de la journée ne change pas.
+> présentation de votre groupe**, à remettre **vendredi à 14 h**.
+>
+> **Mise à jour du vendredi 23, 15 h** : la soutenance ayant lieu lundi
+> après-midi, le tag `v1.0` peut être posé **jusqu'au lundi 26 avant
+> midi**. Vendredi à 17 h, poussez simplement ce que vous avez, même
+> inachevé.
 
 ---
 
@@ -38,14 +42,18 @@ de vous.
 | **14 h** | **présentation remise** (PDF, voir plus bas) |
 | 14 h – 15 h | échange de README avec le groupe partenaire |
 | après-midi | README corrigé d'après les remarques ; si vous le souhaitez, répétition chronométrée devant un autre groupe |
-| **17 h** | **tag `v1.0` poussé**. C'est lui qui est évalué |
+| **17 h** | **tout est poussé**, même inachevé, sur `main` ou sur une branche : c'est votre filet de sécurité. Les groupes prêts posent déjà le tag `v1.0` |
+| **lundi 26, avant midi** | **tag `v1.0` poussé sur `main`**. C'est lui qui est évalué |
 
-**En cas de retard, le lundi 26 au matin sert de tampon** pour l'échange
-de README et pour la répétition chronométrée : vous pouvez les y
-reporter, en accord avec le groupe partenaire. La remise de la
-présentation (vendredi 14 h) et le tag `v1.0` (vendredi 17 h), eux, ne
-bougent pas. Seule exception : un tag `v1.0.1` le lundi avant midi, pour
-le README seul (voir « Le README testé »).
+**Le lundi 26 au matin sert de tampon** : finir l'implémentation et le
+README, faire l'échange de README et la répétition chronométrée, en
+accord avec le groupe partenaire. La remise de la présentation (vendredi
+14 h) ne bouge pas : le jury l'a déjà reçue. Le support que vous
+projetterez lundi peut encore s'améliorer.
+
+Le week-end n'a rien d'obligatoire. Si vous y travaillez, dans cet ordre :
+une démo qui marche de bout en bout, et répétée ; un README qui permet de
+la reproduire ; les finitions.
 
 Ne gardez pas la présentation pour la fin : commencez-la dès jeudi soir,
 ou vendredi matin pendant qu'un membre finit le socle.
@@ -212,10 +220,8 @@ et ce qui s'est passé. Vous corrigez ensuite votre propre README d'après
 le retour que vous avez reçu.
 
 En retard vendredi ? Reportez l'échange au lundi matin, en accord avec le
-groupe partenaire. Vous corrigez alors votre README après le tag `v1.0` :
-posez un tag **`v1.0.1` le lundi avant midi**, qui ne modifie **que le
-`README.md`**. Tout autre changement après `v1.0` ne sera pas pris en
-compte.
+groupe partenaire, et corrigez votre README avant de poser le tag `v1.0`
+(lundi avant midi).
 
 ### La répétition chronométrée (facultative)
 
@@ -235,8 +241,9 @@ vendredi ? Le lundi matin convient aussi.
 
 ### Le tag `v1.0`
 
-Avant 17 h, sur `main` : `passerelle/Version.cpp` annonce `1.0.0`, le `JOURNAL.md`
-est à jour, le tag `v1.0` est poussé.
+Au plus tard **lundi 26 avant midi**, sur `main` : `passerelle/Version.cpp`
+annonce `1.0.0`, le `JOURNAL.md` est à jour, le tag `v1.0` est poussé.
+Vendredi à 17 h, poussez déjà ce que vous avez.
 
 ---
 
@@ -251,4 +258,5 @@ est à jour, le tag `v1.0` est poussé.
 - [ ] accès en lecture au dépôt donné au groupe partenaire **dès jeudi**
 - [ ] README réécrit pour un utilisateur (plus rien du squelette qui ne serve)
 - [ ] README suivi par le groupe partenaire, retour écrit reçu, README corrigé
-- [ ] `passerelle/Version.cpp` annonce `1.0.0`, tag `v1.0` poussé **avant 17 h**, `JOURNAL.md` tenu
+- [ ] tout poussé vendredi à 17 h, même inachevé
+- [ ] `passerelle/Version.cpp` annonce `1.0.0`, tag `v1.0` poussé **lundi 26 avant midi**, `JOURNAL.md` tenu
